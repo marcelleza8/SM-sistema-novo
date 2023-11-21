@@ -9,7 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.3.8"
+    "axios": "^1.6.2",
+    "pinia": "^2.1.7",
+    "vue": "^3.3.8",
+    "vue-router": "4"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
