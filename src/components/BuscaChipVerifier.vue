@@ -1,16 +1,20 @@
 <template>
   <textarea
+    ref="textareaRef"
     class="disabled:bg-gray-400 disabled:text-white"
     :disabled="verifying"
+    v-model="toSearch"
     cols="25"
     rows="20"
     :placeholder="placeholder"
+    @input="validate"
   ></textarea>
-  <button @click="validate">Validar</button>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, defineEmits } from "vue";
+import Swal from "sweetalert2";
+import usePhoneNumbe from "../composable/usePhoneNumber";
 
 defineProps({
   placeholder: {
@@ -18,11 +22,48 @@ defineProps({
   },
 });
 
+const emits = defineEmits(["update:modelValue"]);
+
+const { valid: validPhone } = usePhoneNumbe();
+
+const textareaRef = ref(null);
+const toSearch = ref(null);
 const verifying = ref(false);
 
-const validate = () => {
+const validate = async () => {
   verifying.value = true;
+  validade();
+  verifying.value = false;
 };
+
+function validade() {
+  let formatted = [];
+  let unFormatted = [];
+  let iter = [];
+
+  if (toSearch.value.indexOf("\n")) {
+    iter = toSearch.value.split("\n");
+  } else {
+    iter = [toSearch.value];
+  }
+
+  for (let line of iter) {
+    if (line) {
+      if (line.length == 20) {
+        formatted.push(line);
+      } else if (validPhone(line)) {
+        formatted.push(validPhone(line));
+      } else {
+        unFormatted.push(line);
+      }
+    }
+  }
+
+  emits("update:modelValue", {
+    formatted,
+    unFormatted,
+  });
+}
 </script>
 
 <style scoped></style>
