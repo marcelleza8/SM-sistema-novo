@@ -92,7 +92,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in searchResult">
+          <tr v-for="item in searchResult" v-show="item.visible == true">
             <td>{{ item.index }}<input type="checkbox" name="" id="" /></td>
             <td
               :title="item.linha.oldLine"
@@ -136,6 +136,12 @@ const verify = ref({
   client: null,
 });
 
+const filters = ref({
+  status: new Set(),
+  cliente: new Set(),
+  conta: new Set(),
+});
+
 const searching = ref(false);
 
 const searchResult = ref([]);
@@ -149,6 +155,11 @@ const search = async () => {
       ...verify.value,
     });
     searchResult.value = [];
+    filters.value = {
+      status: new Set(),
+      cliente: new Set(),
+      conta: new Set(),
+    };
 
     let countRows = 0;
 
@@ -177,7 +188,12 @@ const search = async () => {
           include.conta = val.conta;
           include.empresaFatura = val.empresaFatura;
 
+          include.visible = true;
           searchResult.value.push(include);
+
+          filters.value.cliente.add(val.cliente);
+          filters.value.status.add(val.status);
+          filters.value.conta.add(val.conta);
         }
       }
     }
@@ -209,7 +225,12 @@ const search = async () => {
           include.conta = val.conta;
           include.empresaFatura = val.empresaFatura;
 
+          include.visible = true;
           searchResult.value.push(include);
+
+          filters.value.cliente.add(val.cliente);
+          filters.value.status.add(val.status);
+          filters.value.conta.add(val.conta);
         }
       }
     }
@@ -246,7 +267,12 @@ const search = async () => {
           include.conta = val.conta;
           include.empresaFatura = val.empresaFatura;
 
+          include.visible = true;
           searchResult.value.push(include);
+
+          filters.value.cliente.add(val.cliente);
+          filters.value.status.add(val.status);
+          filters.value.conta.add(val.conta);
         }
       }
     }
@@ -264,6 +290,10 @@ const search = async () => {
   }
 
   searching.value = false;
+};
+
+const handleFilter = ($event, index) => {
+  console.log("Filtrando:", index, $event.target.checked);
 };
 
 const formCompleted = computed(() => {
