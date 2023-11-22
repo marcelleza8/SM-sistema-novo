@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "../stores/authStore";
 import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
+import Busca from "../views/Admin/Chip/Busca.vue";
+import Dashboard from "../views/Dashboard.vue";
 
 const routes = [
   {
@@ -9,9 +12,25 @@ const routes = [
     component: Home,
   },
   {
-    path: "/Login",
+    path: "/login",
     name: "Login",
     component: Login,
+  },
+  {
+    path: "/admin/dashboad",
+    name: "Admin/Dashboard",
+    component: Dashboard,
+    meta: {
+      authenticated: true,
+    },
+  },
+  {
+    path: "/admin/chip/busca",
+    name: "Admin/Chip/Busca",
+    component: Busca,
+    meta: {
+      authenticated: true,
+    },
   },
   // outras rotas...
 ];
@@ -19,6 +38,17 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  const isLoggedIn = authStore.isLoggedIn;
+
+  if (to.matched.some((record) => record.meta.authenticated) && !isLoggedIn) {
+    next({ name: "Login" });
+  } else {
+    next();
+  }
 });
 
 export default router;

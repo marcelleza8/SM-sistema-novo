@@ -12,27 +12,29 @@ export const useAuthStore = defineStore("auth", {
   },
   actions: {
     async login(credentials) {
-      try {
-        const response = await api.post("/oauth/token", {
-          ...credentials,
-          grant_type: "password",
-          client_id: "6",
-          client_secret: "ltmQDoZTXiwPOuYAdx1bI9z1KvJBB0dzHixtv20x",
-          scope: "",
-        });
-        this.token = response.data.token;
-        this.isAuthenticated = true;
-        localStorage.setItem("auth-token", this.token);
-      } catch (error) {
-        console.log(error);
-        // Tratar erro de login
-      }
+      const response = await api.post("/oauth/token", {
+        ...credentials,
+        grant_type: import.meta.env.VITE_GRANT_TYPE,
+        client_id: import.meta.env.VITE_CLIENT_ID,
+        client_secret: import.meta.env.VITE_CLIENT_SECRET,
+        scope: import.meta.env.VITE_SCOPE,
+      });
+      this.token = response.data.token;
+      this.isAuthenticated = true;
+      localStorage.setItem("auth-token", this.token);
+      console.log(response);
+      return response;
     },
-    logout() {
+    async logout() {
       this.token = "";
       this.isAuthenticated = false;
-      localStorage.removeItem("auth-token");
-      // Talvez fazer uma chamada API para invalidar o token no servidor
+      try {
+        await api.post("/logout");
+        localStorage.clear();
+        // localStorage.removeItem("auth-token");
+      } catch (error) {
+        throw "Erro ao logout";
+      }
     },
     // Inicializa o estado de autenticação com base no Local Storage
     initializeAuth() {
