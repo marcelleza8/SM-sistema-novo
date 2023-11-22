@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+button.primary {
+  @apply bg-green-700 text-white font-extrabold px-3 py-2 rounded-lg;
+}
