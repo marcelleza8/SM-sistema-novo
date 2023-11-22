@@ -295,7 +295,7 @@ const search = async () => {
       let tst =
         typeof res.data.encontrado != "undefined"
           ? res.data.encontrado
-          : data.antigo;
+          : res.data.antigo;
       for (var nd1 in tst) {
         let found = tst[nd1];
         for (var nd2 in found) {
