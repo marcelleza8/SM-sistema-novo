@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <!-- Cabeçalho -->
     <header class="bg-blue-500 text-white p-4 flex justify-between">
-      <h1>{{ APPNAME }}</h1>
+      <RouterLink :to="{ name: 'Admin/Dashboard' }">{{ APPNAME }}</RouterLink>
       <span class="cursor-pointer" @click="logout">LOGOUT</span>
     </header>
 
