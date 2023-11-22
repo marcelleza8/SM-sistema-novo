@@ -79,6 +79,29 @@
           </div>
         </div>
       </div>
+      <div>
+        <div class="mt-4">
+          <p class="text-sm whitespace-pre" v-if="false">{{ filters }}</p>
+          <ul>
+            <li
+              v-for="(group, groupName) in filters"
+              class="inline-block bg-slate-600 p-2 pt-0 mx-1 space-x-2"
+            >
+              <h1 class="text-xl text-center text-white">
+                {{ groupName }}
+              </h1>
+              <button
+                class="px-3 py-2 bg-green-400 text-sm font-extrabold rounded-lg"
+                :class="{ '!bg-orange-400': option.selected }"
+                @click="changeFilter(option)"
+                v-for="(option, optionsName) in group"
+              >
+                {{ optionsName }} ({{ option.total }})
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
       <table class="w-full" v-if="!searching">
         <thead>
           <tr>
@@ -136,11 +159,7 @@ const verify = ref({
   client: null,
 });
 
-const filters = ref({
-  status: new Set(),
-  cliente: new Set(),
-  conta: new Set(),
-});
+const filters = ref({});
 
 const searching = ref(false);
 
@@ -155,11 +174,7 @@ const search = async () => {
       ...verify.value,
     });
     searchResult.value = [];
-    filters.value = {
-      status: new Set(),
-      cliente: new Set(),
-      conta: new Set(),
-    };
+    filters.value = {};
 
     let countRows = 0;
 
@@ -191,9 +206,28 @@ const search = async () => {
           include.visible = true;
           searchResult.value.push(include);
 
-          filters.value.cliente.add(val.cliente);
-          filters.value.status.add(val.status);
-          filters.value.conta.add(val.conta);
+          /* FILTRO */
+          filters.value["Clientes"] ??= {};
+          filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
+            total: 0,
+            selected: false,
+          };
+          filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
+
+          filters.value["Status"] ??= {};
+          filters.value["Status"][val.status] ??= {
+            total: 0,
+            selected: false,
+          };
+          filters.value["Status"][val.status].total += 1;
+
+          filters.value["Conta"] ??= {};
+          filters.value["Conta"][val.conta] ??= {
+            total: 0,
+            selected: false,
+          };
+          filters.value["Conta"][val.conta].total += 1;
+          /* /FILTTRO */
         }
       }
     }
@@ -228,9 +262,28 @@ const search = async () => {
           include.visible = true;
           searchResult.value.push(include);
 
-          filters.value.cliente.add(val.cliente);
-          filters.value.status.add(val.status);
-          filters.value.conta.add(val.conta);
+          /* FILTRO */
+          filters.value["Clientes"] ??= {};
+          filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
+            total: 0,
+            selected: false,
+          };
+          filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
+
+          filters.value["Status"] ??= {};
+          filters.value["Status"][val.status] ??= {
+            total: 0,
+            selected: false,
+          };
+          filters.value["Status"][val.status].total += 1;
+
+          filters.value["Conta"] ??= {};
+          filters.value["Conta"][val.conta] ??= {
+            total: 0,
+            selected: false,
+          };
+          filters.value["Conta"][val.conta].total += 1;
+          /* /FILTTRO */
         }
       }
     }
@@ -270,9 +323,28 @@ const search = async () => {
           include.visible = true;
           searchResult.value.push(include);
 
-          filters.value.cliente.add(val.cliente);
-          filters.value.status.add(val.status);
-          filters.value.conta.add(val.conta);
+          /* FILTRO */
+          filters.value["Clientes"] ??= {};
+          filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
+            total: 0,
+            selected: false,
+          };
+          filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
+
+          filters.value["Status"] ??= {};
+          filters.value["Status"][val.status] ??= {
+            total: 0,
+            selected: false,
+          };
+          filters.value["Status"][val.status].total += 1;
+
+          filters.value["Conta"] ??= {};
+          filters.value["Conta"][val.conta] ??= {
+            total: 0,
+            selected: false,
+          };
+          filters.value["Conta"][val.conta].total += 1;
+          /* /FILTTRO */
         }
       }
     }
@@ -292,14 +364,13 @@ const search = async () => {
   searching.value = false;
 };
 
-const handleFilter = ($event, index) => {
-  console.log("Filtrando:", index, $event.target.checked);
+const changeFilter = (option) => {
+  option.selected = !option.selected;
 };
 
-const formCompleted = computed(() => {
-  // verify.value.client || verify.value?.items.unFormatted.length > 0
-  return !!verify.value.items?.formatted.length || verify.value.client;
-});
+const formCompleted = computed(
+  () => !!verify.value.items?.formatted.length || verify.value.client
+);
 
 const edit = () => {
   searchResult.value = [];
