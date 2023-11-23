@@ -64,6 +64,7 @@
             >
               Recarregar
             </button>
+            <DropDown @exportSelected="exportSelected"></DropDown>
           </div>
         </div>
         <div class="border border-gray-500">
@@ -71,9 +72,25 @@
             Selecionar
           </h1>
           <div class="flex justify-evenly">
-            <button :disabled="searching" class="!bg-green-500">Todos</button>
-            <button :disabled="searching" class="!bg-green-500">Nenhum</button>
-            <button :disabled="searching" class="!bg-green-500">
+            <button
+              :disabled="searching"
+              @click="selectResults(true)"
+              class="!bg-green-500"
+            >
+              Todos
+            </button>
+            <button
+              :disabled="searching"
+              @click="selectResults(false)"
+              class="!bg-green-500"
+            >
+              Nenhum
+            </button>
+            <button
+              :disabled="searching"
+              @click="selectResults"
+              class="!bg-green-500"
+            >
               Inverter
             </button>
           </div>
@@ -116,7 +133,9 @@
         </thead>
         <tbody>
           <tr v-for="item in searchResult" v-show="item.visible == true">
-            <td>{{ item.index }}<input type="checkbox" name="" id="" /></td>
+            <td>
+              {{ item.index }}<input type="checkbox" v-model="item.checked" />
+            </td>
             <td
               :title="item.linha.oldLine"
               :class="{ 'bg-orange-500': item.linha.oldLine }"
@@ -154,6 +173,7 @@ import BuscaChipverifier from "../../../components/BuscaChipVerifier.vue";
 import { computed, ref } from "vue";
 import Swal from "sweetalert2";
 import api from "../../../api";
+import DropDown from "../../../components/DropDown.vue";
 
 const verify = ref({
   client: null,
@@ -165,16 +185,19 @@ const searching = ref(false);
 
 const searchResult = ref([]);
 
+const downLink = ref("");
+
 const linkUrl = import.meta.env.VITE_MONOLITH_URL;
 
 const search = async () => {
   searching.value = true;
+  filters.value = {};
   try {
     const res = await api.post("admin/chip/buscar", {
       ...verify.value,
     });
+    downLink.value = res.data.downLink;
     searchResult.value = [];
-    filters.value = {};
 
     let countRows = 0;
 
@@ -364,8 +387,32 @@ const search = async () => {
   searching.value = false;
 };
 
+const filteredRows = computed(() =>
+  searchResult.value.filter((item) => item.checked === true)
+);
+
+const exportSelected = (selected) => {
+  window.open(downLink.value + "?" + selected.join("&"), "_blank");
+};
+
 const changeFilter = (option) => {
   option.selected = !option.selected;
+};
+
+const selectResults = (value) => {
+  searchResult.value.forEach((i) => {
+    if (value === true) {
+      // Define 'i.checked' como true para todos os itens
+      i.checked = true;
+    } else if (value === false) {
+      // Define 'i.checked' como false para todos os itens
+      i.checked = false;
+    } else if (typeof value !== "boolean") {
+      // Inverte 'i.checked' para cada item
+      // Se 'i.checked' for undefined, considera como false e inverte para true
+      i.checked = i.checked === undefined ? true : !i.checked;
+    }
+  });
 };
 
 const formCompleted = computed(
