@@ -98,7 +98,6 @@
       </div>
       <div>
         <div class="mt-4">
-          <p class="text-sm" v-if="false">{{ filters }}</p>
           <ul>
             <li
               v-for="(group, groupName) in filters"
@@ -117,7 +116,7 @@
                 @click="selectSubFilter(groupName, optionsName)"
                 v-for="(option, optionsName) in group"
               >
-                {{ optionsName }} ({{ option.total }} -
+                {{ optionsName || "Nenhum" }} ({{ option.total }} -
                 {{ ((option.total / searchResult.length) * 100).toFixed(2) }} %)
               </button>
             </li>
@@ -236,12 +235,12 @@ const search = async () => {
           searchResult.value.push(include);
 
           /* FILTRO */
-          filters.value["Clientes"] ??= {};
-          filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
+          filters.value["Cliente"] ??= {};
+          filters.value["Cliente"][val.cliente ?? ""] ??= {
             total: 0,
             selected: true,
           };
-          filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
+          filters.value["Cliente"][val.cliente ?? ""].total += 1;
 
           filters.value["Status"] ??= {};
           filters.value["Status"][val.status] ??= {
@@ -251,11 +250,11 @@ const search = async () => {
           filters.value["Status"][val.status].total += 1;
 
           filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta ?? "Nenhum"] ??= {
+          filters.value["Conta"][val.conta ?? ""] ??= {
             total: 0,
             selected: true,
           };
-          filters.value["Conta"][val.conta ?? "Nenhum"].total += 1;
+          filters.value["Conta"][val.conta ?? ""].total += 1;
           /* /FILTTRO */
         }
       }
@@ -264,7 +263,6 @@ const search = async () => {
     if (typeof res.data.disponivel != "undefined") {
       for (var nd1 in res.data.disponivel) {
         let found = res.data.disponivel[nd1];
-        console.log(found);
         for (var nd2 in found) {
           let val = found[nd2];
 
@@ -292,12 +290,12 @@ const search = async () => {
           searchResult.value.push(include);
 
           /* FILTRO */
-          filters.value["Clientes"] ??= {};
-          filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
+          filters.value["Cliente"] ??= {};
+          filters.value["Cliente"][val.cliente ?? ""] ??= {
             total: 0,
             selected: true,
           };
-          filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
+          filters.value["Cliente"][val.cliente ?? ""].total += 1;
 
           filters.value["Status"] ??= {};
           filters.value["Status"][val.status] ??= {
@@ -307,11 +305,11 @@ const search = async () => {
           filters.value["Status"][val.status].total += 1;
 
           filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta ?? "Nenhum"] ??= {
+          filters.value["Conta"][val.conta ?? ""] ??= {
             total: 0,
             selected: true,
           };
-          filters.value["Conta"][val.conta ?? "Nenhum"].total += 1;
+          filters.value["Conta"][val.conta ?? ""].total += 1;
           /* /FILTTRO */
         }
       }
@@ -353,12 +351,12 @@ const search = async () => {
           searchResult.value.push(include);
 
           /* FILTRO */
-          filters.value["Clientes"] ??= {};
-          filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
+          filters.value["Cliente"] ??= {};
+          filters.value["Cliente"][val.cliente ?? ""] ??= {
             total: 0,
             selected: true,
           };
-          filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
+          filters.value["Cliente"][val.cliente ?? ""].total += 1;
 
           filters.value["Status"] ??= {};
           filters.value["Status"][val.status] ??= {
@@ -368,17 +366,16 @@ const search = async () => {
           filters.value["Status"][val.status].total += 1;
 
           filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta ?? "Nenhum"] ??= {
+          filters.value["Conta"][val.conta ?? ""] ??= {
             total: 0,
             selected: true,
           };
-          filters.value["Conta"][val.conta ?? "Nenhum"].total += 1;
+          filters.value["Conta"][val.conta ?? ""].total += 1;
           /* /FILTTRO */
         }
       }
     }
   } catch (error) {
-    console.log(error);
     Swal.fire({
       toast: true,
       icon: "info",
@@ -424,13 +421,20 @@ const formCompleted = computed(
 const filteredResults = computed(() => {
   return searchResult.value.filter((item) => {
     return Object.entries(filters.value).every(([categoria, opcoes]) => {
-      const valorItem = item[categoria.toLowerCase()];
+      let valorItem = item[categoria.toLowerCase()];
+
+      // Tratando explicitamente valores undefined, null e strings vazias
+      if (valorItem === undefined || valorItem === null || valorItem === "") {
+        valorItem = ""; // Usar uma string vazia para a comparação
+      }
+
       return opcoes[valorItem]?.selected !== false;
     });
   });
 });
 
 function selectSubFilter(categoria, opcao) {
+  console.log(categoria, opcao);
   filters.value[categoria][opcao].selected =
     !filters.value[categoria][opcao].selected;
 }
