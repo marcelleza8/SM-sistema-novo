@@ -100,14 +100,14 @@
         <div class="mt-4">
           <ul>
             <li
-              v-for="(group, groupName) in filters"
-              class="inline-block bg-slate-600 p-2 pt-0 mx-1 space-x-2"
+              v-for="(group, groupName) in sortedFiltersByTotal"
+              class="bg-slate-200 p-2 pt-0 mx-1 space-x-2 space-y-2 flex items-center my-1 flex-wrap"
             >
-              <h1 class="text-xl text-center text-white">
+              <h1 class="text-center">
                 {{ groupName }}
               </h1>
               <button
-                class="px-3 py-2 text-sm font-extrabold rounded-lg"
+                class="font-extrabold p-1 px-2 rounded-lg whitespace-nowrap"
                 :class="{
                   'bg-blue-500 hover:bg-blue-700 text-white': option.selected,
                   'bg-gray-200 hover:bg-gray-400/30 text-black/50':
@@ -186,12 +186,13 @@
 </template>
 
 <script setup>
+import { computed, ref } from "vue";
+import Swal from "sweetalert2";
+import { orderBy } from "lodash";
+import api from "../../../api";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import SelectAjaxVue from "../../../components/SelectAjax.vue";
 import BuscaChipverifier from "../../../components/BuscaChipVerifier.vue";
-import { computed, ref } from "vue";
-import Swal from "sweetalert2";
-import api from "../../../api";
 import DropDown from "../../../components/DropDown.vue";
 
 const verify = ref({
@@ -449,6 +450,40 @@ function selectSubFilter(categoria, opcao) {
   filters.value[categoria][opcao].selected =
     !filters.value[categoria][opcao].selected;
 }
+
+/**
+ * Propriedade computada que ordena os filtros pelos totais em ordem ascendente.
+ * @returns {Object} Objeto de filtros com cada subcategoria ordenada por total.
+ */
+const sortedFiltersByTotal = computed(() => {
+  // Objeto para armazenar os filtros ordenados.
+  const sortedFilters = {};
+
+  // Iterando sobre cada categoria de filtro.
+  Object.keys(filters.value).forEach((categoria) => {
+    // Obtendo as subcategorias e seus respectivos dados da categoria atual.
+    const subcategorias = filters.value[categoria];
+
+    // Ordenando as subcategorias com base no valor 'total'.
+    // Usamos a função 'sort' para ordenar os pares chave-valor.
+    const orderedSubcategorias = Object.entries(subcategorias)
+      .sort((a, b) => {
+        // a[1] e b[1] representam os objetos de cada subcategoria.
+        // Convertemos o 'total' de cada subcategoria em número para a comparação.
+        return Number(a[1].total) - Number(b[1].total);
+      })
+      .reduce((accumulator, [key, value]) => {
+        // Reconstruímos o objeto com subcategorias ordenadas.
+        return { ...accumulator, [key]: value };
+      }, {});
+
+    // Atribuindo as subcategorias ordenadas à categoria correspondente.
+    sortedFilters[categoria] = orderedSubcategorias;
+  });
+
+  // Retornando o objeto de filtros com as subcategorias ordenadas.
+  return sortedFilters;
+});
 
 const edit = () => {
   searchResult.value = [];
