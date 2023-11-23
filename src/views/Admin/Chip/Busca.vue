@@ -123,10 +123,21 @@
           </ul>
         </div>
       </div>
-      <div v-if="!searching">
-        Mostrando {{ filteredResults.length }} de
-        {{ searchResult.length }} resultados
+      <div
+        class="bg-gray-200 font-extrabold p-4 mt-4 flex justify-between"
+        v-if="!searching"
+      >
+        <div>
+          Mostrando
+          <span class="text-orange-800">{{ filteredResults.length }}</span> de
+          <span class="text-green-800">{{ searchResult.length }}</span>
+          resultados
+        </div>
+        <div v-if="checkedRows.length">
+          <span>{{ checkedRows.length }}</span> Selecionados
+        </div>
       </div>
+
       <table class="w-full" v-if="!searching">
         <thead>
           <tr>
