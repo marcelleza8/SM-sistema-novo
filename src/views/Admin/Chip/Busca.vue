@@ -98,7 +98,7 @@
       </div>
       <div>
         <div class="mt-4">
-          <p class="text-sm whitespace-pre" v-if="false">{{ filters }}</p>
+          <p class="text-sm" v-if="false">{{ filters }}</p>
           <ul>
             <li
               v-for="(group, groupName) in filters"
@@ -108,16 +108,25 @@
                 {{ groupName }}
               </h1>
               <button
-                class="px-3 py-2 bg-green-400 text-sm font-extrabold rounded-lg"
-                :class="{ '!bg-orange-400': option.selected }"
-                @click="changeFilter(option)"
+                class="px-3 py-2 text-sm font-extrabold rounded-lg"
+                :class="{
+                  'bg-blue-500 hover:bg-blue-700 text-white': option.selected,
+                  'bg-gray-200 hover:bg-gray-400/30 text-black/50':
+                    !option.selected,
+                }"
+                @click="selectSubFilter(groupName, optionsName)"
                 v-for="(option, optionsName) in group"
               >
-                {{ optionsName }} ({{ option.total }})
+                {{ optionsName }} ({{ option.total }} -
+                {{ ((option.total / searchResult.length) * 100).toFixed(2) }} %)
               </button>
             </li>
           </ul>
         </div>
+      </div>
+      <div v-if="!searching">
+        Mostrando {{ filteredResults.length }} de
+        {{ searchResult.length }} resultados
       </div>
       <table class="w-full" v-if="!searching">
         <thead>
@@ -132,7 +141,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in searchResult" v-show="item.visible == true">
+          <tr v-for="item in filteredResults" v-show="item.visible == true">
             <td>
               {{ item.index }}<input type="checkbox" v-model="item.checked" />
             </td>
@@ -180,11 +189,8 @@ const verify = ref({
 });
 
 const filters = ref({});
-
 const searching = ref(false);
-
 const searchResult = ref([]);
-
 const downLink = ref("");
 
 const linkUrl = import.meta.env.VITE_MONOLITH_URL;
@@ -233,23 +239,23 @@ const search = async () => {
           filters.value["Clientes"] ??= {};
           filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
           filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
 
           filters.value["Status"] ??= {};
           filters.value["Status"][val.status] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
           filters.value["Status"][val.status].total += 1;
 
           filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta] ??= {
+          filters.value["Conta"][val.conta ?? "Nenhum"] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
-          filters.value["Conta"][val.conta].total += 1;
+          filters.value["Conta"][val.conta ?? "Nenhum"].total += 1;
           /* /FILTTRO */
         }
       }
@@ -289,23 +295,23 @@ const search = async () => {
           filters.value["Clientes"] ??= {};
           filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
           filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
 
           filters.value["Status"] ??= {};
           filters.value["Status"][val.status] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
           filters.value["Status"][val.status].total += 1;
 
           filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta] ??= {
+          filters.value["Conta"][val.conta ?? "Nenhum"] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
-          filters.value["Conta"][val.conta].total += 1;
+          filters.value["Conta"][val.conta ?? "Nenhum"].total += 1;
           /* /FILTTRO */
         }
       }
@@ -350,23 +356,23 @@ const search = async () => {
           filters.value["Clientes"] ??= {};
           filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
           filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
 
           filters.value["Status"] ??= {};
           filters.value["Status"][val.status] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
           filters.value["Status"][val.status].total += 1;
 
           filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta] ??= {
+          filters.value["Conta"][val.conta ?? "Nenhum"] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
-          filters.value["Conta"][val.conta].total += 1;
+          filters.value["Conta"][val.conta ?? "Nenhum"].total += 1;
           /* /FILTTRO */
         }
       }
@@ -387,16 +393,12 @@ const search = async () => {
   searching.value = false;
 };
 
-const filteredRows = computed(() =>
+const checkedRows = computed(() =>
   searchResult.value.filter((item) => item.checked === true)
 );
 
 const exportSelected = (selected) => {
   window.open(downLink.value + "?" + selected.join("&"), "_blank");
-};
-
-const changeFilter = (option) => {
-  option.selected = !option.selected;
 };
 
 const selectResults = (value) => {
@@ -418,6 +420,20 @@ const selectResults = (value) => {
 const formCompleted = computed(
   () => !!verify.value.items?.formatted.length || verify.value.client
 );
+
+const filteredResults = computed(() => {
+  return searchResult.value.filter((item) => {
+    return Object.entries(filters.value).every(([categoria, opcoes]) => {
+      const valorItem = item[categoria.toLowerCase()];
+      return opcoes[valorItem]?.selected !== false;
+    });
+  });
+});
+
+function selectSubFilter(categoria, opcao) {
+  filters.value[categoria][opcao].selected =
+    !filters.value[categoria][opcao].selected;
+}
 
 const edit = () => {
   searchResult.value = [];
