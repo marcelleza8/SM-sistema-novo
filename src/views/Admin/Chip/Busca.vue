@@ -64,6 +64,7 @@
             >
               Recarregar
             </button>
+            <DropDown @exportSelected="exportSelected"></DropDown>
           </div>
         </div>
         <div class="border border-gray-500">
@@ -71,9 +72,25 @@
             Selecionar
           </h1>
           <div class="flex justify-evenly">
-            <button :disabled="searching" class="!bg-green-500">Todos</button>
-            <button :disabled="searching" class="!bg-green-500">Nenhum</button>
-            <button :disabled="searching" class="!bg-green-500">
+            <button
+              :disabled="searching"
+              @click="selectResults(true)"
+              class="!bg-green-500"
+            >
+              Todos
+            </button>
+            <button
+              :disabled="searching"
+              @click="selectResults(false)"
+              class="!bg-green-500"
+            >
+              Nenhum
+            </button>
+            <button
+              :disabled="searching"
+              @click="selectResults"
+              class="!bg-green-500"
+            >
               Inverter
             </button>
           </div>
@@ -81,27 +98,46 @@
       </div>
       <div>
         <div class="mt-4">
-          <p class="text-sm whitespace-pre" v-if="false">{{ filters }}</p>
           <ul>
             <li
-              v-for="(group, groupName) in filters"
-              class="inline-block bg-slate-600 p-2 pt-0 mx-1 space-x-2"
+              v-for="(group, groupName) in sortedFiltersByTotal"
+              class="bg-slate-200 p-2 pt-0 mx-1 space-x-2 space-y-2 flex items-center my-1 flex-wrap"
             >
-              <h1 class="text-xl text-center text-white">
+              <h1 class="text-center">
                 {{ groupName }}
               </h1>
               <button
-                class="px-3 py-2 bg-green-400 text-sm font-extrabold rounded-lg"
-                :class="{ '!bg-orange-400': option.selected }"
-                @click="changeFilter(option)"
+                class="font-extrabold p-1 px-2 rounded-lg whitespace-nowrap"
+                :class="{
+                  'bg-blue-500 hover:bg-blue-700 text-white': option.selected,
+                  'bg-gray-200 hover:bg-gray-400/30 text-black/50':
+                    !option.selected,
+                }"
+                @click="selectSubFilter(groupName, optionsName)"
                 v-for="(option, optionsName) in group"
               >
-                {{ optionsName }} ({{ option.total }})
+                {{ optionsName || "Nenhum" }} ({{ option.total }} -
+                {{ ((option.total / searchResult.length) * 100).toFixed(2) }} %)
               </button>
             </li>
           </ul>
         </div>
       </div>
+      <div
+        class="bg-gray-200 font-extrabold p-4 mt-4 flex justify-between"
+        v-if="!searching"
+      >
+        <div>
+          Mostrando
+          <span class="text-orange-800">{{ filteredResults.length }}</span> de
+          <span class="text-green-800">{{ searchResult.length }}</span>
+          resultados
+        </div>
+        <div v-if="checkedRows.length">
+          <span>{{ checkedRows.length }}</span> Selecionados
+        </div>
+      </div>
+
       <table class="w-full" v-if="!searching">
         <thead>
           <tr>
@@ -115,8 +151,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in searchResult" v-show="item.visible == true">
-            <td>{{ item.index }}<input type="checkbox" name="" id="" /></td>
+          <tr v-for="item in filteredResults" v-show="item.visible == true">
+            <td>
+              {{ item.index }}<input type="checkbox" v-model="item.checked" />
+            </td>
             <td
               :title="item.linha.oldLine"
               :class="{ 'bg-orange-500': item.linha.oldLine }"
@@ -148,33 +186,35 @@
 </template>
 
 <script setup>
+import { computed, ref } from "vue";
+import Swal from "sweetalert2";
+import { orderBy } from "lodash";
+import api from "../../../api";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import SelectAjaxVue from "../../../components/SelectAjax.vue";
 import BuscaChipverifier from "../../../components/BuscaChipVerifier.vue";
-import { computed, ref } from "vue";
-import Swal from "sweetalert2";
-import api from "../../../api";
+import DropDown from "../../../components/DropDown.vue";
 
 const verify = ref({
   client: null,
 });
 
 const filters = ref({});
-
 const searching = ref(false);
-
 const searchResult = ref([]);
+const downLink = ref("");
 
 const linkUrl = import.meta.env.VITE_MONOLITH_URL;
 
 const search = async () => {
   searching.value = true;
+  filters.value = {};
   try {
     const res = await api.post("admin/chip/buscar", {
       ...verify.value,
     });
+    downLink.value = res.data.downLink;
     searchResult.value = [];
-    filters.value = {};
 
     let countRows = 0;
 
@@ -207,26 +247,26 @@ const search = async () => {
           searchResult.value.push(include);
 
           /* FILTRO */
-          filters.value["Clientes"] ??= {};
-          filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
+          filters.value["Cliente"] ??= {};
+          filters.value["Cliente"][val.cliente ?? ""] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
-          filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
+          filters.value["Cliente"][val.cliente ?? ""].total += 1;
 
           filters.value["Status"] ??= {};
           filters.value["Status"][val.status] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
           filters.value["Status"][val.status].total += 1;
 
           filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta] ??= {
+          filters.value["Conta"][val.conta ?? ""] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
-          filters.value["Conta"][val.conta].total += 1;
+          filters.value["Conta"][val.conta ?? ""].total += 1;
           /* /FILTTRO */
         }
       }
@@ -235,7 +275,6 @@ const search = async () => {
     if (typeof res.data.disponivel != "undefined") {
       for (var nd1 in res.data.disponivel) {
         let found = res.data.disponivel[nd1];
-        console.log(found);
         for (var nd2 in found) {
           let val = found[nd2];
 
@@ -263,26 +302,26 @@ const search = async () => {
           searchResult.value.push(include);
 
           /* FILTRO */
-          filters.value["Clientes"] ??= {};
-          filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
+          filters.value["Cliente"] ??= {};
+          filters.value["Cliente"][val.cliente ?? ""] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
-          filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
+          filters.value["Cliente"][val.cliente ?? ""].total += 1;
 
           filters.value["Status"] ??= {};
           filters.value["Status"][val.status] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
           filters.value["Status"][val.status].total += 1;
 
           filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta] ??= {
+          filters.value["Conta"][val.conta ?? ""] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
-          filters.value["Conta"][val.conta].total += 1;
+          filters.value["Conta"][val.conta ?? ""].total += 1;
           /* /FILTTRO */
         }
       }
@@ -324,32 +363,31 @@ const search = async () => {
           searchResult.value.push(include);
 
           /* FILTRO */
-          filters.value["Clientes"] ??= {};
-          filters.value["Clientes"][val.cliente ?? "Nenhum"] ??= {
+          filters.value["Cliente"] ??= {};
+          filters.value["Cliente"][val.cliente ?? ""] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
-          filters.value["Clientes"][val.cliente ?? "Nenhum"].total += 1;
+          filters.value["Cliente"][val.cliente ?? ""].total += 1;
 
           filters.value["Status"] ??= {};
           filters.value["Status"][val.status] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
           filters.value["Status"][val.status].total += 1;
 
           filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta] ??= {
+          filters.value["Conta"][val.conta ?? ""] ??= {
             total: 0,
-            selected: false,
+            selected: true,
           };
-          filters.value["Conta"][val.conta].total += 1;
+          filters.value["Conta"][val.conta ?? ""].total += 1;
           /* /FILTTRO */
         }
       }
     }
   } catch (error) {
-    console.log(error);
     Swal.fire({
       toast: true,
       icon: "info",
@@ -364,13 +402,88 @@ const search = async () => {
   searching.value = false;
 };
 
-const changeFilter = (option) => {
-  option.selected = !option.selected;
+const checkedRows = computed(() =>
+  searchResult.value.filter((item) => item.checked === true)
+);
+
+const exportSelected = (selected) => {
+  window.open(downLink.value + "?" + selected.join("&"), "_blank");
+};
+
+const selectResults = (value) => {
+  searchResult.value.forEach((i) => {
+    if (value === true) {
+      // Define 'i.checked' como true para todos os itens
+      i.checked = true;
+    } else if (value === false) {
+      // Define 'i.checked' como false para todos os itens
+      i.checked = false;
+    } else if (typeof value !== "boolean") {
+      // Inverte 'i.checked' para cada item
+      // Se 'i.checked' for undefined, considera como false e inverte para true
+      i.checked = i.checked === undefined ? true : !i.checked;
+    }
+  });
 };
 
 const formCompleted = computed(
   () => !!verify.value.items?.formatted.length || verify.value.client
 );
+
+const filteredResults = computed(() => {
+  return searchResult.value.filter((item) => {
+    return Object.entries(filters.value).every(([categoria, opcoes]) => {
+      let valorItem = item[categoria.toLowerCase()];
+
+      // Tratando explicitamente valores undefined, null e strings vazias
+      if (valorItem === undefined || valorItem === null || valorItem === "") {
+        valorItem = ""; // Usar uma string vazia para a comparação
+      }
+
+      return opcoes[valorItem]?.selected !== false;
+    });
+  });
+});
+
+function selectSubFilter(categoria, opcao) {
+  console.log(categoria, opcao);
+  filters.value[categoria][opcao].selected =
+    !filters.value[categoria][opcao].selected;
+}
+
+/**
+ * Propriedade computada que ordena os filtros pelos totais em ordem ascendente.
+ * @returns {Object} Objeto de filtros com cada subcategoria ordenada por total.
+ */
+const sortedFiltersByTotal = computed(() => {
+  // Objeto para armazenar os filtros ordenados.
+  const sortedFilters = {};
+
+  // Iterando sobre cada categoria de filtro.
+  Object.keys(filters.value).forEach((categoria) => {
+    // Obtendo as subcategorias e seus respectivos dados da categoria atual.
+    const subcategorias = filters.value[categoria];
+
+    // Ordenando as subcategorias com base no valor 'total'.
+    // Usamos a função 'sort' para ordenar os pares chave-valor.
+    const orderedSubcategorias = Object.entries(subcategorias)
+      .sort((a, b) => {
+        // a[1] e b[1] representam os objetos de cada subcategoria.
+        // Convertemos o 'total' de cada subcategoria em número para a comparação.
+        return Number(a[1].total) - Number(b[1].total);
+      })
+      .reduce((accumulator, [key, value]) => {
+        // Reconstruímos o objeto com subcategorias ordenadas.
+        return { ...accumulator, [key]: value };
+      }, {});
+
+    // Atribuindo as subcategorias ordenadas à categoria correspondente.
+    sortedFilters[categoria] = orderedSubcategorias;
+  });
+
+  // Retornando o objeto de filtros com as subcategorias ordenadas.
+  return sortedFilters;
+});
 
 const edit = () => {
   searchResult.value = [];

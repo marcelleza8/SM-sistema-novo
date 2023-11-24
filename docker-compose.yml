@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  node:
+    profiles:
+      - donotstart
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    volumes:
+      - .:/app
+    command: npm run dev
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "8088:80"
+    # depends_on:
+    #   - node
