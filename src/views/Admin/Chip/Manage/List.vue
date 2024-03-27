@@ -1,6 +1,11 @@
 <template>
   <DashboardLayout>
-    <h1 class="text-3xl">Lista de Chip</h1>
+    <div class="flex justify-between my-4 mb-6 mr-4">
+      <h1 class="text-3xl">Lista de Chip</h1>
+      <button class="bg-green-200 px-4 py-1 rounded-md font-bold">
+        Adicionar
+      </button>
+    </div>
     <DataTable :items="items"></DataTable>
     <Pagination
       class="mt-4"
