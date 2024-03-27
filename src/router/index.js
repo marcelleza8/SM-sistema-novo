@@ -4,6 +4,7 @@ import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
 import Busca from "../views/Admin/Chip/Busca.vue";
 import Dashboard from "../views/Dashboard.vue";
+import AdminChipListPage from "../views/Admin/Chip/Manage/List.vue";
 
 const routes = [
   {
@@ -28,6 +29,14 @@ const routes = [
     path: "/admin/chip/busca",
     name: "Admin/Chip/Busca",
     component: Busca,
+    meta: {
+      authenticated: true,
+    },
+  },
+  {
+    path: "/admin/chip/",
+    name: "AdminChipListPage",
+    component: AdminChipListPage,
     meta: {
       authenticated: true,
     },
