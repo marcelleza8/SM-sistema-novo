@@ -103,7 +103,7 @@
               v-for="(group, groupName) in sortedFiltersByTotal"
               class="bg-slate-200 p-2 pt-0 mx-1 space-x-2 space-y-2 flex items-center my-1 flex-wrap"
             >
-              <h1 class="text-center">
+              <h1 class="text-center" @click="massSelection(groupName)">
                 {{ groupName }}
               </h1>
               <button
@@ -188,7 +188,6 @@
 <script setup>
 import { computed, ref } from "vue";
 import Swal from "sweetalert2";
-import { orderBy } from "lodash";
 import api from "../../../api";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import SelectAjaxVue from "../../../components/SelectAjax.vue";
@@ -424,6 +423,12 @@ const selectResults = (value) => {
       i.checked = i.checked === undefined ? true : !i.checked;
     }
   });
+};
+
+const massSelection = (categoria) => {
+  Object.values(filters.value[categoria]).forEach(
+    (item) => (item.selected = !item.selected)
+  );
 };
 
 const formCompleted = computed(
