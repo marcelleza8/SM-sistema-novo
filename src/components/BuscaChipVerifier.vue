@@ -12,8 +12,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from "vue";
-import Swal from "sweetalert2";
+import { ref } from "vue";
 import usePhoneNumbe from "../composable/usePhoneNumber";
 
 defineProps({
