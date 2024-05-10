@@ -17,7 +17,9 @@
     </main>
 
     <!-- Rodapé -->
-    <footer class="bg-gray-500 text-white p-4">Meu Rodapé</footer>
+    <footer class="bg-gray-500 text-white p-4 flex justify-end">
+      <div>V. {{ appVersion }}</div>
+    </footer>
   </div>
 </template>
 
@@ -26,6 +28,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
 
 const APPNAME = import.meta.env.VITE_APPNAME;
+const appVersion = process.env.VUE_APP_VERSION;
 const router = useRouter();
 
 const logout = async () => {
