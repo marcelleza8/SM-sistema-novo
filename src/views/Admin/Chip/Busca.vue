@@ -1,5 +1,8 @@
 <template>
   <DashboardLayout>
+    <div v-if="timerId > -1" class="p-4 px-2 pt-0">
+      <span>{{ timer }}</span>
+    </div>
     <div class="grid grid-cols-2" v-if="!searchResult.length">
       <div>
         <button
@@ -202,12 +205,19 @@ const filters = ref({});
 const searching = ref(false);
 const searchResult = ref([]);
 const downLink = ref("");
+const timerId = ref(-1);
+const timer = ref(0);
 
 const linkUrl = import.meta.env.VITE_MONOLITH_URL;
 
 const search = async () => {
   searching.value = true;
   filters.value = {};
+  const now = new Date();
+  timerId.value = setInterval(() => {
+    // const formattedTime = formatarTempoDecorrido(new Date());
+    timer.value = formatarTempoDecorrido(now);
+  }, 1);
   try {
     const res = await api.post("admin/chip/buscar", {
       ...verify.value,
@@ -398,6 +408,7 @@ const search = async () => {
     });
   }
 
+  clearInterval(timerId.value);
   searching.value = false;
 };
 
@@ -456,6 +467,30 @@ function selectSubFilter(categoria, opcao) {
     !filters.value[categoria][opcao].selected;
 }
 
+function formatarTempoDecorrido(dataInicio) {
+  const agora = new Date();
+  let diferenca = agora - dataInicio; // Diferença em milissegundos
+
+  // Convertendo de milissegundos para horas, minutos e segundos
+  // const horas = Math.floor(diferenca / (1000 * 60 * 60));
+  // diferenca -= horas * 1000 * 60 * 60;
+  const minutos = Math.floor(diferenca / (1000 * 60));
+  diferenca -= minutos * 1000 * 60;
+  const segundos = Math.floor(diferenca / 1000);
+  diferenca -= segundos * 1000; // Subtraindo os segundos em milissegundos
+  const milissegundos = diferenca; // Restante são milissegundos
+
+  // Formatando para string com dois dígitos para horas, minutos, segundos e três para milissegundos
+  const formatado = [
+    // horas.toString().padStart(2, "0") + "h",
+    minutos.toString().padStart(2, "0") + "m",
+    segundos.toString().padStart(2, "0") + "s",
+    milissegundos.toString().padStart(3, "0") + "mm", // Garantindo três dígitos para milissegundos
+  ].join(":");
+
+  return formatado;
+}
+
 /**
  * Propriedade computada que ordena os filtros pelos totais em ordem ascendente.
  * @returns {Object} Objeto de filtros com cada subcategoria ordenada por total.
@@ -492,6 +527,7 @@ const sortedFiltersByTotal = computed(() => {
 
 const edit = () => {
   searchResult.value = [];
+  timerId.value = -1;
 };
 
 const reset = () => {
