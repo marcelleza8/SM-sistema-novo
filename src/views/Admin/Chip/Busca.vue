@@ -142,7 +142,7 @@
       </div>
 
       <table class="w-full" v-if="!searching">
-        <thead>
+        <thead class="text-sm">
           <tr>
             <th></th>
             <th>Linha</th>
@@ -150,10 +150,16 @@
             <th>Status</th>
             <th>Cliente</th>
             <th>Conta</th>
-            <th>Empresa fatura</th>
+            <th>Último Acesso</th>
+            <th>Conexão</th>
+            <th>Cons. Total</th>
+            <th>Cons. Diário</th>
+            <th>IMEI Op.</th>
+            <th>APN Op.</th>
+            <th>Status Op.</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="text-xs">
           <tr v-for="item in filteredResults" v-show="item.visible == true">
             <td>
               {{ item.index }}<input type="checkbox" v-model="item.checked" />
@@ -180,7 +186,13 @@
             <td>{{ item.status }}</td>
             <td>{{ item.cliente }}</td>
             <td>{{ item.conta }}</td>
-            <td>{{ item.empresaFatura }}</td>
+            <td>{{ item.details?.ultimo_acesso }}</td>
+            <td>{{ item.details?.conexao }}</td>
+            <td>{{ item.details?.consumo_total }}</td>
+            <td>{{ item.details?.consumo_diario }}</td>
+            <td>{{ item.details?.imei_aparelho }}</td>
+            <td>{{ item.details?.apn }}</td>
+            <td>{{ item.details?.status_operadora }}</td>
           </tr>
         </tbody>
       </table>
@@ -250,7 +262,8 @@ const search = async () => {
           include.status = val.status;
           include.cliente = val.cliente;
           include.conta = val.conta;
-          include.empresaFatura = val.empresaFatura;
+          include.details = val?.details;
+          // include.empresaFatura = val.empresaFatura;
 
           include.visible = true;
           searchResult.value.push(include);
@@ -305,7 +318,8 @@ const search = async () => {
           include.status = val.status;
           include.cliente = val.cliente;
           include.conta = val.conta;
-          include.empresaFatura = val.empresaFatura;
+          include.details = val?.details;
+          // include.empresaFatura = val.empresaFatura;
 
           include.visible = true;
           searchResult.value.push(include);
@@ -366,7 +380,8 @@ const search = async () => {
           include.status = val.status;
           include.cliente = val.cliente;
           include.conta = val.conta;
-          include.empresaFatura = val.empresaFatura;
+          include.details = val?.details;
+          // include.empresaFatura = val.empresaFatura;
 
           include.visible = true;
           searchResult.value.push(include);
@@ -462,7 +477,7 @@ const filteredResults = computed(() => {
 });
 
 function selectSubFilter(categoria, opcao) {
-  console.log(categoria, opcao);
+  // console.log(categoria, opcao); //DEBUG
   filters.value[categoria][opcao].selected =
     !filters.value[categoria][opcao].selected;
 }
@@ -545,7 +560,7 @@ tr:nth-child(even) {
   @apply bg-pink-400/50;
 }
 td {
-  @apply border p-4;
+  @apply border p-1;
 }
 
 .result-control button {
