@@ -431,8 +431,26 @@ const checkedRows = computed(() =>
   searchResult.value.filter((item) => item.checked === true)
 );
 
-const exportSelected = (selected) => {
-  window.open(downLink.value + "?" + selected.join("&"), "_blank");
+const exportSelected = async (selected) => {
+  const response = await api({
+    url: downLink.value + "?" + selected.join("&"),
+    method: "GET",
+    responseType: "blob",
+  });
+
+  const contentDisposition = response.headers["content-disposition"];
+
+  let filename = contentDisposition
+    ? contentDisposition.replace(/.*filename="?(.+\..{3,4})"?/, "$1")
+    : "resultado.csv";
+
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", filename); // Nome do arquivo para download
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 const selectResults = (value) => {
