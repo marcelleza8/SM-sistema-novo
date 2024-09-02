@@ -155,6 +155,8 @@
             <th>Cons. Total</th>
             <th>Cons. Diário</th>
             <th>IMEI Op.</th>
+            <th>Rede</th>
+            <th>Tecnol.</th>
             <th>APN Op.</th>
             <th>Status Op.</th>
           </tr>
@@ -191,6 +193,8 @@
             <td>{{ item.details?.consumo_total }}</td>
             <td>{{ item.details?.consumo_diario }}</td>
             <td>{{ item.details?.imei_aparelho }}</td>
+            <td>{{ item.details?.rede }}</td>
+            <td>{{ item.details?.tecnologia }}</td>
             <td>{{ item.details?.apn }}</td>
             <td>{{ item.details?.status_operadora }}</td>
           </tr>
