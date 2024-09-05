@@ -16,6 +16,7 @@
           <SelectAjaxVue
             :disabled="searching"
             label="Selecione um cliente"
+            @enterPressed="search"
             v-model="verify.client"
             url="admin/clientes/buscar"
           />
@@ -99,6 +100,7 @@
           </div>
         </div>
       </div>
+      <ChipChangeStatus :items="checkedRows" @changed="handleChangedStatus" />
       <div>
         <div class="mt-4">
           <ul>
@@ -141,65 +143,79 @@
         </div>
       </div>
 
-      <table class="w-full" v-if="!searching">
-        <thead class="text-sm">
-          <tr>
-            <th></th>
-            <th>Linha</th>
-            <th>ICCID</th>
-            <th>Status</th>
-            <th>Cliente</th>
-            <th>Conta</th>
-            <th>Último Acesso</th>
-            <th>Conexão</th>
-            <th>Cons. Total</th>
-            <th>Cons. Diário</th>
-            <th>IMEI Op.</th>
-            <th>Rede</th>
-            <th>Tecnol.</th>
-            <th>APN Op.</th>
-            <th>Status Op.</th>
-          </tr>
-        </thead>
-        <tbody class="text-xs">
-          <tr v-for="item in filteredResults" v-show="item.visible == true">
-            <td>
-              {{ item.index }}<input type="checkbox" v-model="item.checked" />
-            </td>
-            <td
-              :title="item.linha.oldLine"
-              :class="{ 'bg-orange-500': item.linha.oldLine }"
-            >
-              <a
-                :href="`${linkUrl}admin/chip/editar/${item.linha.chipId}`"
-                target="_blank"
-                rel="noopener noreferrer"
-                >{{ item.linha.text }}</a
+      <div class="overflow-x-auto">
+        <table class="w-full" v-if="!searching">
+          <thead class="text-sm">
+            <tr>
+              <th>
+                <button
+                  class="p-2 py-0.5 rounded-md bg-orange-600 cursor-pointer"
+                  title="Selecione todos os registros visíveis"
+                  @click="selectVisible"
+                >
+                  S
+                </button>
+              </th>
+              <th>Linha</th>
+              <th>ICCID</th>
+              <th>Status</th>
+              <th>Cliente</th>
+              <th>Conta</th>
+              <th>Último Acesso</th>
+              <th>Conexão</th>
+              <th>Cons. Total</th>
+              <th>Cons. Diário</th>
+              <th>IMEI Op.</th>
+              <th>Rede</th>
+              <th>Tecnol.</th>
+              <th>APN Op.</th>
+              <th>Status Op.</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody class="text-xs">
+            <tr v-for="item in filteredResults" v-show="item.visible == true">
+              <td>
+                {{ item.index }}<input type="checkbox" v-model="item.checked" />
+              </td>
+              <td
+                :title="item.linha.oldLine"
+                :class="{ 'bg-orange-500': item.linha.oldLine }"
               >
-            </td>
-            <td>
-              <a
-                :href="`${linkUrl}admin/chip/editar/${item.linha.chipId}`"
-                target="_blank"
-                rel="noopener noreferrer"
-                >{{ item.iccid.text }}</a
-              >
-            </td>
-            <td>{{ item.status }}</td>
-            <td>{{ item.cliente }}</td>
-            <td>{{ item.conta }}</td>
-            <td>{{ item.details?.ultimo_acesso }}</td>
-            <td>{{ item.details?.conexao }}</td>
-            <td>{{ item.details?.consumo_total }}</td>
-            <td>{{ item.details?.consumo_diario }}</td>
-            <td>{{ item.details?.imei_aparelho }}</td>
-            <td>{{ item.details?.rede }}</td>
-            <td>{{ item.details?.tecnologia }}</td>
-            <td>{{ item.details?.apn }}</td>
-            <td>{{ item.details?.status_operadora }}</td>
-          </tr>
-        </tbody>
-      </table>
+                <a
+                  :href="`${linkUrl}admin/chip/editar/${item.linha.chipId}`"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >{{ item.linha.text }}</a
+                >
+              </td>
+              <td>
+                <a
+                  :href="`${linkUrl}admin/chip/editar/${item.linha.chipId}`"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >{{ item.iccid.text }}</a
+                >
+              </td>
+              <td>{{ item.status }}</td>
+              <td>{{ item.cliente }}</td>
+              <td>{{ item.conta }}</td>
+              <td>{{ item.details?.ultimo_acesso }}</td>
+              <td>{{ item.details?.conexao }}</td>
+              <td>{{ item.details?.consumo_total }}</td>
+              <td>{{ item.details?.consumo_diario }}</td>
+              <td>{{ item.details?.imei_aparelho }}</td>
+              <td>{{ item.details?.rede }}</td>
+              <td>{{ item.details?.tecnologia }}</td>
+              <td>{{ item.details?.apn }}</td>
+              <td>{{ item.details?.status_operadora }}</td>
+              <td>
+                <button class="p-1 bg-red-400">I</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </DashboardLayout>
 </template>
@@ -212,7 +228,8 @@ import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import SelectAjaxVue from "../../../components/SelectAjax.vue";
 import BuscaChipverifier from "../../../components/BuscaChipVerifier.vue";
 import DropDown from "../../../components/DropDown.vue";
-
+import ChipChangeStatus from "../../../components/ChipChangeStatus.vue";
+import { handler } from "@tailwindcss/aspect-ratio";
 const verify = ref({
   client: null,
 });
@@ -479,6 +496,12 @@ const massSelection = (categoria) => {
   );
 };
 
+const selectVisible = () => {
+  filteredResults.value
+    .filter((r) => r.visible === true)
+    .forEach((r) => (r.checked = true));
+};
+
 const formCompleted = computed(
   () => !!verify.value.items?.formatted.length || verify.value.client
 );
@@ -572,6 +595,12 @@ const reset = () => {
   verify.value.client = null;
   verify.value.items = null;
 };
+
+function handleChangedStatus(data) {
+  if (data?.status) {
+    search();
+  }
+}
 </script>
 
 <style scoped>
