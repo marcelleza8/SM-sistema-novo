@@ -1,18 +1,24 @@
 <template>
-  <textarea
-    ref="textareaRef"
-    class="disabled:bg-gray-400 disabled:text-white"
-    :disabled="verifying"
-    v-model="toSearch"
-    cols="25"
-    rows="20"
-    :placeholder="placeholder"
-    @input="validate"
-  ></textarea>
+  <div class="flex flex-col">
+    <p>
+      Total de linhas:
+      {{ totalRows }}
+    </p>
+    <textarea
+      ref="textareaRef"
+      class="disabled:bg-gray-400 disabled:text-white"
+      :disabled="verifying"
+      v-model="toSearch"
+      cols="25"
+      rows="20"
+      :placeholder="placeholder"
+      @input="validate"
+    ></textarea>
+  </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import usePhoneNumbe from "../composable/usePhoneNumber";
 
 defineProps({
@@ -28,6 +34,10 @@ const { valid: validPhone } = usePhoneNumbe();
 const textareaRef = ref(null);
 const toSearch = ref(null);
 const verifying = ref(false);
+
+const totalRows = computed(
+  () => toSearch.value?.split("\n").filter((l) => !!l.trim()).length
+);
 
 const validate = async () => {
   verifying.value = true;
