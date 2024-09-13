@@ -1,6 +1,6 @@
 <template>
   <DashboardLayout>
-    <div v-if="timerId > -1" class="p-4 px-2 pt-0">
+    <div v-if="timerId > -1" class="px-2 pt-0">
       <span>{{ timer }}</span>
     </div>
     <div class="grid grid-cols-2" v-if="!searchResult.length">
@@ -42,11 +42,11 @@
     </div>
     <div v-else>
       <div class="grid grid-cols-2 gap-4 result-control">
-        <div class="border border-gray-500">
-          <h1 class="block text-center text-xl font-extrabold mb-4">
+        <div>
+          <h1 class="block text-center text-xl font-extrabold mb-1">
             Consulta
           </h1>
-          <div class="flex justify-evenly">
+          <div class="flex justify-evenly border border-gray-500 py-2">
             <button
               :disabled="searching"
               class="bg-green-700 text-white"
@@ -71,11 +71,11 @@
             <DropDown @exportSelected="exportSelected"></DropDown>
           </div>
         </div>
-        <div class="border border-gray-500">
-          <h1 class="block text-center text-xl font-extrabold mb-4">
+        <div>
+          <h1 class="block text-center text-xl font-extrabold mb-1">
             Selecionar
           </h1>
-          <div class="flex justify-evenly">
+          <div class="flex justify-evenly border border-gray-500 py-2">
             <button
               :disabled="searching"
               @click="selectResults(true)"
@@ -143,9 +143,9 @@
         </div>
       </div>
 
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto h-96 border border-black">
         <table class="w-full" v-if="!searching">
-          <thead class="text-sm">
+          <thead class="text-sm sticky top-0 bg-white z-10">
             <tr>
               <th>
                 <button
@@ -611,7 +611,11 @@ tr:nth-child(even) {
   @apply bg-pink-400/50;
 }
 td {
-  @apply border p-1;
+  @apply border p-1 whitespace-nowrap;
+}
+
+th {
+  @apply whitespace-nowrap;
 }
 
 .result-control button {

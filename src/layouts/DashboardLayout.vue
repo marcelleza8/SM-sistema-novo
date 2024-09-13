@@ -12,7 +12,7 @@
     </nav>
 
     <!-- Área do Dashboard -->
-    <main class="flex-1 p-4">
+    <main class="flex-1 p-4 overflow-auto">
       <slot></slot>
     </main>
 
