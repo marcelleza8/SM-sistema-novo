@@ -42,28 +42,28 @@
     </div>
     <div v-else>
       <div class="grid grid-cols-2 gap-4 result-control">
-        <div>
+        <div class="text-sm">
           <h1 class="block text-center text-xl font-extrabold mb-1">
             Consulta
           </h1>
           <div class="flex justify-evenly border border-gray-500 py-2">
             <button
               :disabled="searching"
-              class="bg-green-700 text-white"
+              class="bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400 disabled:bg-gray-500"
               @click="reset"
             >
               Nova
             </button>
             <button
               :disabled="searching"
-              class="bg-orange-700 text-white"
+              class="bg-orange-100 text-orange-800 dark:bg-gray-700 dark:text-orange-400 border border-orange-400 disabled:bg-gray-500"
               @click="edit"
             >
               Editar
             </button>
             <button
               :disabled="searching"
-              class="bg-yellow-700 text-white"
+              class="bg-yellow-100 text-yellow-800 dark:bg-gray-700 dark:text-yellow-400 border border-yellow-400 disabled:bg-gray-500"
               @click="search"
             >
               Recarregar
@@ -79,21 +79,21 @@
             <button
               :disabled="searching"
               @click="selectResults(true)"
-              class="!bg-green-500"
+              class="bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400 disabled:bg-gray-500"
             >
               Todos
             </button>
             <button
               :disabled="searching"
               @click="selectResults(false)"
-              class="!bg-green-500"
+              class="bg-red-100 text-red-800 dark:bg-gray-700 dark:text-red-400 border border-red-400 disabled:bg-gray-500"
             >
               Nenhum
             </button>
             <button
               :disabled="searching"
               @click="selectResults"
-              class="!bg-green-500"
+              class="bg-orange-100 text-orange-800 dark:bg-gray-700 dark:text-orange-400 border border-orange-400 disabled:bg-gray-500"
             >
               Inverter
             </button>
@@ -108,15 +108,17 @@
               v-for="(group, groupName) in sortedFiltersByTotal"
               class="bg-slate-200 p-2 pt-0 mx-1 space-x-2 space-y-2 flex items-center my-1 flex-wrap"
             >
-              <h1 class="text-center" @click="massSelection(groupName)">
+              <h1 class="text-center text-sm" @click="massSelection(groupName)">
                 {{ groupName }}
               </h1>
               <button
-                class="font-extrabold p-1 px-2 rounded-lg whitespace-nowrap"
+                class="text-xs font-medium me-2 px-2.5 py-0.5 rounded whitespace-nowrap"
                 :class="{
-                  'bg-blue-500 hover:bg-blue-700 text-white': option.selected,
-                  'bg-gray-200 hover:bg-gray-400/30 text-black/50':
+                  'bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400':
+                    option.selected,
+                  'bg-red-100 text-red-800 dark:bg-gray-700 dark:text-red-400 border border-red-400':
                     !option.selected,
+                  'cursor-wait': selectingFilter,
                 }"
                 @click="selectSubFilter(groupName, optionsName)"
                 v-for="(option, optionsName) in group"
@@ -174,9 +176,18 @@
             </tr>
           </thead>
           <tbody class="text-xs">
-            <tr v-for="item in filteredResults" v-show="item.visible == true">
-              <td>
-                {{ item.index }}<input type="checkbox" v-model="item.checked" />
+            <tr
+              v-for="item in filteredResults"
+              v-show="item.visible == true"
+              :class="{ checkedRow: item.checked }"
+              @click="selectRow(item)"
+            >
+              <td class="text-center">
+                <input
+                  type="checkbox"
+                  class="bg-orange-500"
+                  v-model="item.checked"
+                />
               </td>
               <td
                 :title="item.linha.oldLine"
@@ -185,6 +196,7 @@
                 <a
                   :href="`${linkUrl}admin/chip/editar/${item.linha.chipId}`"
                   target="_blank"
+                  class="cursor-pointer text-green-700 font-bold"
                   rel="noopener noreferrer"
                   >{{ item.linha.text }}</a
                 >
@@ -193,6 +205,7 @@
                 <a
                   :href="`${linkUrl}admin/chip/editar/${item.linha.chipId}`"
                   target="_blank"
+                  class="cursor-pointer text-green-700 font-bold"
                   rel="noopener noreferrer"
                   >{{ item.iccid.text }}</a
                 >
@@ -240,6 +253,8 @@ const searchResult = ref([]);
 const downLink = ref("");
 const timerId = ref(-1);
 const timer = ref(0);
+
+const selectingFilter = ref(false);
 
 const linkUrl = import.meta.env.VITE_MONOLITH_URL;
 
@@ -502,6 +517,10 @@ const selectVisible = () => {
     .forEach((r) => (r.checked = true));
 };
 
+const selectRow = (row) => {
+  row.checked = !row.checked;
+};
+
 const formCompleted = computed(
   () => !!verify.value.items?.formatted.length || verify.value.client
 );
@@ -523,8 +542,12 @@ const filteredResults = computed(() => {
 
 function selectSubFilter(categoria, opcao) {
   // console.log(categoria, opcao); //DEBUG
+  selectingFilter.value = true;
   filters.value[categoria][opcao].selected =
     !filters.value[categoria][opcao].selected;
+  setTimeout(() => {
+    selectingFilter.value = false;
+  }, 500);
 }
 
 function formatarTempoDecorrido(dataInicio) {
@@ -604,12 +627,14 @@ function handleChangedStatus(data) {
 </script>
 
 <style scoped>
-table a {
-  @apply underline text-blue-500;
-}
 tr:nth-child(even) {
   @apply bg-pink-400/50;
 }
+
+.checkedRow {
+  @apply !bg-gray-300;
+}
+
 td {
   @apply border p-1 whitespace-nowrap;
 }
@@ -618,7 +643,11 @@ th {
   @apply whitespace-nowrap;
 }
 
+tbody tr * {
+  @apply cursor-default;
+}
+
 .result-control button {
-  @apply disabled:bg-gray-500 py-2 px-4 rounded-md font-extrabold;
+  @apply py-1 px-2 rounded-md;
 }
 </style>

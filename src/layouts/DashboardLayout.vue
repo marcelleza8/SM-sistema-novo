@@ -12,12 +12,12 @@
     </nav>
 
     <!-- Área do Dashboard -->
-    <main class="flex-1 p-4 overflow-auto">
+    <main class="flex-1 p-4">
       <slot></slot>
     </main>
 
     <!-- Rodapé -->
-    <footer class="bg-gray-500 text-white p-4 flex justify-end">
+    <footer class="bg-gray-500 text-white px-6 py-0.5 flex justify-end">
       <div>V. {{ appVersion }}</div>
     </footer>
   </div>

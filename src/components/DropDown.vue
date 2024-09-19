@@ -2,13 +2,13 @@
   <div class="relative">
     <button
       @click="toggleDropdown"
-      class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+      class="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-gray-700 dark:text-blue-400 border border-blue-400 rounded-md"
     >
       Exportar
     </button>
     <div
       v-if="showDropdown"
-      class="absolute mt-2 bg-white border rounded shadow-lg w-52"
+      class="absolute mt-2 bg-white border rounded shadow-lg w-52 z-20"
     >
       <div class="p-4">
         <div
