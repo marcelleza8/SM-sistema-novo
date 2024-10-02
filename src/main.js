@@ -10,6 +10,7 @@ import { createPinia } from "pinia";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
+import { pt } from "vuetify/locale";
 
 const app = createApp(App);
 
@@ -17,6 +18,10 @@ const app = createApp(App);
 const vuetify = createVuetify({
   components,
   directives,
+  locale: {
+    locale: "pt",
+    messages: { pt },
+  },
 });
 
 // Configuração global do Axios
