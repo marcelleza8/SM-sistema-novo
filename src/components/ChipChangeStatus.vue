@@ -166,15 +166,15 @@ const newStatus = computed(
 );
 
 const allowChange = computed(
-  () => props.items.length > 0 && statusToChange.value > -1
+  () => true //props.items.length > 0 && statusToChange.value > -1
 );
 
 const handleChangeStatus = async () => {
   let data = {};
 
   data["data"] = props.items.map((i) => ({
-    chipId: i.linha.chipId,
-    linha: i.linha.text,
+    chipId: i.chipId,
+    linha: i.linha,
     status: newStatus.value.id,
     iccid: null, //i.iccid.text,
   }));

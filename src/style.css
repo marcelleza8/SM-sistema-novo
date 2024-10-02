@@ -5,3 +5,7 @@
 button.primary {
   @apply bg-green-700 text-white font-extrabold px-3 py-2 rounded-lg;
 }
+
+body.swal2-toast-shown .swal2-container {
+  width: auto !important;
+}

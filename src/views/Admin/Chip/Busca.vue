@@ -41,194 +41,36 @@
       <div>importação</div>
     </div>
     <div v-else>
-      <div class="grid grid-cols-2 gap-4 result-control">
+      <div class="result-control">
         <div class="text-sm">
-          <h1 class="block text-center text-xl font-extrabold mb-1">
-            Consulta
-          </h1>
           <div class="flex justify-evenly border border-gray-500 py-2">
             <button
               :disabled="searching"
               class="bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400 disabled:bg-gray-500"
               @click="reset"
             >
-              Nova
+              Nova consulta
             </button>
             <button
               :disabled="searching"
               class="bg-orange-100 text-orange-800 dark:bg-gray-700 dark:text-orange-400 border border-orange-400 disabled:bg-gray-500"
               @click="edit"
             >
-              Editar
+              Editar dados da consulta atual
             </button>
             <button
               :disabled="searching"
               class="bg-yellow-100 text-yellow-800 dark:bg-gray-700 dark:text-yellow-400 border border-yellow-400 disabled:bg-gray-500"
               @click="search"
             >
-              Recarregar
+              Recarregar consulta atual
             </button>
             <DropDown @exportSelected="exportSelected"></DropDown>
           </div>
         </div>
-        <div>
-          <h1 class="block text-center text-xl font-extrabold mb-1">
-            Selecionar
-          </h1>
-          <div class="flex justify-evenly border border-gray-500 py-2">
-            <button
-              :disabled="searching"
-              @click="selectResults(true)"
-              class="bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400 disabled:bg-gray-500"
-            >
-              Todos
-            </button>
-            <button
-              :disabled="searching"
-              @click="selectResults(false)"
-              class="bg-red-100 text-red-800 dark:bg-gray-700 dark:text-red-400 border border-red-400 disabled:bg-gray-500"
-            >
-              Nenhum
-            </button>
-            <button
-              :disabled="searching"
-              @click="selectResults"
-              class="bg-orange-100 text-orange-800 dark:bg-gray-700 dark:text-orange-400 border border-orange-400 disabled:bg-gray-500"
-            >
-              Inverter
-            </button>
-          </div>
-        </div>
       </div>
       <ChipChangeStatus :items="checkedRows" @changed="handleChangedStatus" />
-      <div>
-        <div class="mt-4">
-          <ul>
-            <li
-              v-for="(group, groupName) in sortedFiltersByTotal"
-              class="bg-slate-200 p-2 pt-0 mx-1 space-x-2 space-y-2 flex items-center my-1 flex-wrap"
-            >
-              <h1 class="text-center text-sm" @click="massSelection(groupName)">
-                {{ groupName }}
-              </h1>
-              <button
-                class="text-xs font-medium me-2 px-2.5 py-0.5 rounded whitespace-nowrap"
-                :class="{
-                  'bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400':
-                    option.selected,
-                  'bg-red-100 text-red-800 dark:bg-gray-700 dark:text-red-400 border border-red-400':
-                    !option.selected,
-                  'cursor-wait': selectingFilter,
-                }"
-                @click="selectSubFilter(groupName, optionsName)"
-                v-for="(option, optionsName) in group"
-              >
-                {{ optionsName || "Nenhum" }} ({{ option.total }} -
-                {{ ((option.total / searchResult.length) * 100).toFixed(2) }} %)
-              </button>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div
-        class="bg-gray-200 font-extrabold p-4 mt-4 flex justify-between"
-        v-if="!searching"
-      >
-        <div>
-          Mostrando
-          <span class="text-orange-800">{{ filteredResults.length }}</span> de
-          <span class="text-green-800">{{ searchResult.length }}</span>
-          resultados
-        </div>
-        <div v-if="checkedRows.length">
-          <span>{{ checkedRows.length }}</span> Selecionados
-        </div>
-      </div>
-
-      <div class="overflow-x-auto h-96 border border-black">
-        <table class="w-full" v-if="!searching">
-          <thead class="text-sm sticky top-0 bg-white z-10">
-            <tr>
-              <th>
-                <button
-                  class="p-2 py-0.5 rounded-md bg-orange-600 cursor-pointer"
-                  title="Selecione todos os registros visíveis"
-                  @click="selectVisible"
-                >
-                  S
-                </button>
-              </th>
-              <th>Linha</th>
-              <th>ICCID</th>
-              <th>Status</th>
-              <th>Cliente</th>
-              <th>Conta</th>
-              <th>Último Acesso</th>
-              <th>Conexão</th>
-              <th>Cons. Total</th>
-              <th>Cons. Diário</th>
-              <th>IMEI Op.</th>
-              <th>Rede</th>
-              <th>Tecnol.</th>
-              <th>APN Op.</th>
-              <th>Status Op.</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody class="text-xs">
-            <tr
-              v-for="item in filteredResults"
-              v-show="item.visible == true"
-              :class="{ checkedRow: item.checked }"
-              @click="selectRow(item)"
-            >
-              <td class="text-center">
-                <input
-                  type="checkbox"
-                  class="bg-orange-500"
-                  v-model="item.checked"
-                />
-              </td>
-              <td
-                :title="item.linha.oldLine"
-                :class="{ 'bg-orange-500': item.linha.oldLine }"
-              >
-                <a
-                  :href="`${linkUrl}admin/chip/editar/${item.linha.chipId}`"
-                  target="_blank"
-                  class="cursor-pointer text-green-700 font-bold"
-                  rel="noopener noreferrer"
-                  >{{ item.linha.text }}</a
-                >
-              </td>
-              <td>
-                <a
-                  :href="`${linkUrl}admin/chip/editar/${item.linha.chipId}`"
-                  target="_blank"
-                  class="cursor-pointer text-green-700 font-bold"
-                  rel="noopener noreferrer"
-                  >{{ item.iccid.text }}</a
-                >
-              </td>
-              <td>{{ item.status }}</td>
-              <td>{{ item.cliente }}</td>
-              <td>{{ item.conta }}</td>
-              <td>{{ item.details?.ultimo_acesso }}</td>
-              <td>{{ item.details?.conexao }}</td>
-              <td>{{ item.details?.consumo_total }}</td>
-              <td>{{ item.details?.consumo_diario }}</td>
-              <td>{{ item.details?.imei_aparelho }}</td>
-              <td>{{ item.details?.rede }}</td>
-              <td>{{ item.details?.tecnologia }}</td>
-              <td>{{ item.details?.apn }}</td>
-              <td>{{ item.details?.status_operadora }}</td>
-              <td>
-                <button class="p-1 bg-red-400">I</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <VdataTable :items="searchResult" v-model:selected="checkedRows" />
     </div>
   </DashboardLayout>
 </template>
@@ -241,6 +83,7 @@ import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import SelectAjaxVue from "../../../components/SelectAjax.vue";
 import BuscaChipverifier from "../../../components/BuscaChipVerifier.vue";
 import DropDown from "../../../components/DropDown.vue";
+import VdataTable from "../../../components/Tables/VdataTable.vue";
 import ChipChangeStatus from "../../../components/ChipChangeStatus.vue";
 import { handler } from "@tailwindcss/aspect-ratio";
 const verify = ref({
@@ -254,12 +97,11 @@ const downLink = ref("");
 const timerId = ref(-1);
 const timer = ref(0);
 
-const selectingFilter = ref(false);
-
-const linkUrl = import.meta.env.VITE_MONOLITH_URL;
+// const linkUrl = import.meta.env.VITE_MONOLITH_URL;
 
 const search = async () => {
   searching.value = true;
+  searchResult.value = [];
   filters.value = {};
   const now = new Date();
   timerId.value = setInterval(() => {
@@ -271,182 +113,7 @@ const search = async () => {
       ...verify.value,
     });
     downLink.value = res.data.downLink;
-    searchResult.value = [];
-
-    let countRows = 0;
-
-    if (typeof res.data.cancelado != "undefined") {
-      for (var nd1 in res.data.cancelado) {
-        let found = res.data.cancelado[nd1];
-        for (var nd2 in found) {
-          let val = found[nd2];
-          let include = {};
-
-          include.index = ++countRows;
-
-          include.linha = {
-            chipId: val.chipId,
-            text: val.linha,
-            oldLine: val?.oldLine || null,
-          };
-
-          include.iccid = {
-            chipId: val.chipId,
-            text: val.iccid,
-          };
-
-          include.status = val.status;
-          include.cliente = val.cliente;
-          include.conta = val.conta;
-          include.details = val?.details;
-          // include.empresaFatura = val.empresaFatura;
-
-          include.visible = true;
-          searchResult.value.push(include);
-
-          /* FILTRO */
-          filters.value["Cliente"] ??= {};
-          filters.value["Cliente"][val.cliente ?? ""] ??= {
-            total: 0,
-            selected: true,
-          };
-          filters.value["Cliente"][val.cliente ?? ""].total += 1;
-
-          filters.value["Status"] ??= {};
-          filters.value["Status"][val.status] ??= {
-            total: 0,
-            selected: true,
-          };
-          filters.value["Status"][val.status].total += 1;
-
-          filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta ?? ""] ??= {
-            total: 0,
-            selected: true,
-          };
-          filters.value["Conta"][val.conta ?? ""].total += 1;
-          /* /FILTTRO */
-        }
-      }
-    }
-
-    if (typeof res.data.disponivel != "undefined") {
-      for (var nd1 in res.data.disponivel) {
-        let found = res.data.disponivel[nd1];
-        for (var nd2 in found) {
-          let val = found[nd2];
-
-          let include = {};
-
-          include.index = ++countRows;
-
-          include.linha = {
-            chipId: val.chipId,
-            text: val.linha,
-            oldLine: val?.oldLine || null,
-          };
-
-          include.iccid = {
-            chipId: val.chipId,
-            text: val.iccid,
-          };
-
-          include.status = val.status;
-          include.cliente = val.cliente;
-          include.conta = val.conta;
-          include.details = val?.details;
-          // include.empresaFatura = val.empresaFatura;
-
-          include.visible = true;
-          searchResult.value.push(include);
-
-          /* FILTRO */
-          filters.value["Cliente"] ??= {};
-          filters.value["Cliente"][val.cliente ?? ""] ??= {
-            total: 0,
-            selected: true,
-          };
-          filters.value["Cliente"][val.cliente ?? ""].total += 1;
-
-          filters.value["Status"] ??= {};
-          filters.value["Status"][val.status] ??= {
-            total: 0,
-            selected: true,
-          };
-          filters.value["Status"][val.status].total += 1;
-
-          filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta ?? ""] ??= {
-            total: 0,
-            selected: true,
-          };
-          filters.value["Conta"][val.conta ?? ""].total += 1;
-          /* /FILTTRO */
-        }
-      }
-    }
-
-    if (
-      typeof res.data.encontrado != "undefined" ||
-      typeof res.data.antigo != "undefined"
-    ) {
-      let tst =
-        typeof res.data.encontrado != "undefined"
-          ? res.data.encontrado
-          : res.data.antigo;
-      for (var nd1 in tst) {
-        let found = tst[nd1];
-        for (var nd2 in found) {
-          let val = found[nd2];
-          let include = {};
-
-          include.index = ++countRows;
-
-          include.linha = {
-            chipId: val.chipId,
-            text: val.linha,
-            oldLine: val?.oldLine || null,
-          };
-
-          include.iccid = {
-            chipId: val.chipId,
-            text: val.iccid,
-          };
-
-          include.status = val.status;
-          include.cliente = val.cliente;
-          include.conta = val.conta;
-          include.details = val?.details;
-          // include.empresaFatura = val.empresaFatura;
-
-          include.visible = true;
-          searchResult.value.push(include);
-
-          /* FILTRO */
-          filters.value["Cliente"] ??= {};
-          filters.value["Cliente"][val.cliente ?? ""] ??= {
-            total: 0,
-            selected: true,
-          };
-          filters.value["Cliente"][val.cliente ?? ""].total += 1;
-
-          filters.value["Status"] ??= {};
-          filters.value["Status"][val.status] ??= {
-            total: 0,
-            selected: true,
-          };
-          filters.value["Status"][val.status].total += 1;
-
-          filters.value["Conta"] ??= {};
-          filters.value["Conta"][val.conta ?? ""] ??= {
-            total: 0,
-            selected: true,
-          };
-          filters.value["Conta"][val.conta ?? ""].total += 1;
-          /* /FILTTRO */
-        }
-      }
-    }
+    searchResult.value = res.data.result;
   } catch (error) {
     Swal.fire({
       toast: true,
@@ -463,9 +130,7 @@ const search = async () => {
   searching.value = false;
 };
 
-const checkedRows = computed(() =>
-  searchResult.value.filter((item) => item.checked === true)
-);
+const checkedRows = ref();
 
 const exportSelected = async (selected) => {
   const response = await api({
@@ -489,66 +154,9 @@ const exportSelected = async (selected) => {
   document.body.removeChild(link);
 };
 
-const selectResults = (value) => {
-  searchResult.value.forEach((i) => {
-    if (value === true) {
-      // Define 'i.checked' como true para todos os itens
-      i.checked = true;
-    } else if (value === false) {
-      // Define 'i.checked' como false para todos os itens
-      i.checked = false;
-    } else if (typeof value !== "boolean") {
-      // Inverte 'i.checked' para cada item
-      // Se 'i.checked' for undefined, considera como false e inverte para true
-      i.checked = i.checked === undefined ? true : !i.checked;
-    }
-  });
-};
-
-const massSelection = (categoria) => {
-  Object.values(filters.value[categoria]).forEach(
-    (item) => (item.selected = !item.selected)
-  );
-};
-
-const selectVisible = () => {
-  filteredResults.value
-    .filter((r) => r.visible === true)
-    .forEach((r) => (r.checked = true));
-};
-
-const selectRow = (row) => {
-  row.checked = !row.checked;
-};
-
 const formCompleted = computed(
   () => !!verify.value.items?.formatted.length || verify.value.client
 );
-
-const filteredResults = computed(() => {
-  return searchResult.value.filter((item) => {
-    return Object.entries(filters.value).every(([categoria, opcoes]) => {
-      let valorItem = item[categoria.toLowerCase()];
-
-      // Tratando explicitamente valores undefined, null e strings vazias
-      if (valorItem === undefined || valorItem === null || valorItem === "") {
-        valorItem = ""; // Usar uma string vazia para a comparação
-      }
-
-      return opcoes[valorItem]?.selected !== false;
-    });
-  });
-});
-
-function selectSubFilter(categoria, opcao) {
-  // console.log(categoria, opcao); //DEBUG
-  selectingFilter.value = true;
-  filters.value[categoria][opcao].selected =
-    !filters.value[categoria][opcao].selected;
-  setTimeout(() => {
-    selectingFilter.value = false;
-  }, 500);
-}
 
 function formatarTempoDecorrido(dataInicio) {
   const agora = new Date();
@@ -574,40 +182,6 @@ function formatarTempoDecorrido(dataInicio) {
   return formatado;
 }
 
-/**
- * Propriedade computada que ordena os filtros pelos totais em ordem ascendente.
- * @returns {Object} Objeto de filtros com cada subcategoria ordenada por total.
- */
-const sortedFiltersByTotal = computed(() => {
-  // Objeto para armazenar os filtros ordenados.
-  const sortedFilters = {};
-
-  // Iterando sobre cada categoria de filtro.
-  Object.keys(filters.value).forEach((categoria) => {
-    // Obtendo as subcategorias e seus respectivos dados da categoria atual.
-    const subcategorias = filters.value[categoria];
-
-    // Ordenando as subcategorias com base no valor 'total'.
-    // Usamos a função 'sort' para ordenar os pares chave-valor.
-    const orderedSubcategorias = Object.entries(subcategorias)
-      .sort((a, b) => {
-        // a[1] e b[1] representam os objetos de cada subcategoria.
-        // Convertemos o 'total' de cada subcategoria em número para a comparação.
-        return Number(a[1].total) - Number(b[1].total);
-      })
-      .reduce((accumulator, [key, value]) => {
-        // Reconstruímos o objeto com subcategorias ordenadas.
-        return { ...accumulator, [key]: value };
-      }, {});
-
-    // Atribuindo as subcategorias ordenadas à categoria correspondente.
-    sortedFilters[categoria] = orderedSubcategorias;
-  });
-
-  // Retornando o objeto de filtros com as subcategorias ordenadas.
-  return sortedFilters;
-});
-
 const edit = () => {
   searchResult.value = [];
   timerId.value = -1;
@@ -621,6 +195,15 @@ const reset = () => {
 
 function handleChangedStatus(data) {
   if (data?.status) {
+    Swal.fire({
+      icon: "success",
+      timerProgressBar: true,
+      showConfirmButton: false,
+      timer: 3500,
+      toast: true,
+      position: "top-end",
+      title: "Status de chip alterado com sucesso",
+    });
     search();
   }
 }
