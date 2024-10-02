@@ -1,6 +1,8 @@
 import { createApp } from "vue";
 import "./style.css";
 import "vuetify/styles"; // Importa os estilos básicos do Vuetify
+import "@mdi/font/css/materialdesignicons.css";
+
 import App from "./App.vue";
 import axios from "axios";
 import router from "./router";
