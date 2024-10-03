@@ -116,7 +116,7 @@ const headers = ref([
   { title: "Tecnologia", value: "tecnologia", sortable: true, nowrap: true },
   { title: "APN", value: "apn", sortable: true, nowrap: true },
   {
-    title: "Status",
+    title: "Status na operadora",
     value: "statusOperadora",
     sortable: true,
     nowrap: true,
