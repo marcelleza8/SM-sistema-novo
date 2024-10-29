@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { useHumanReadableBytes } from "../../composable/useHumanReadableBytes";
 import { useDateUtils } from "../../composable/useDateUtils";
 
@@ -80,6 +80,12 @@ const headers = ref([
   { title: "Linha", value: "linha", sortable: true, nowrap: true },
   { title: "ICCID", value: "iccid", sortable: true, nowrap: true },
   { title: "Status", value: "status", sortable: true, nowrap: true },
+  {
+    title: "Plano",
+    value: "plano",
+    sortable: true,
+    nowrap: true,
+  },
   { title: "Operadora", value: "operadora", sortable: true, nowrap: true },
   {
     title: "Último Acesso",
@@ -91,12 +97,6 @@ const headers = ref([
   {
     title: "Consumo Total",
     value: "consumoTotal",
-    sortable: true,
-    nowrap: true,
-  },
-  {
-    title: "Consumo Diário",
-    value: "consumoDiario",
     sortable: true,
     nowrap: true,
   },
