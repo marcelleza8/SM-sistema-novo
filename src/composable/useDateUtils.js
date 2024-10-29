@@ -11,7 +11,9 @@ export function useDateUtils() {
     if (!dateString.length) {
       return "";
     }
-    const date = parseISO(dateString);
+
+    const date = parseISO(dateString.replace(/(.)$/, ""));
+
     return dateFnsFormat(date, formatString, { locale: ptBR });
   };
 
