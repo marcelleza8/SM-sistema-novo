@@ -5,13 +5,18 @@
     </div>
     <div class="grid grid-cols-2" v-if="!searchResult.length">
       <div>
-        <button
-          @click="search"
-          :disabled="!formCompleted || searching"
-          class="primary disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          Verificar Linhas
-        </button>
+        <div class="space-x-6">
+          <button
+            @click="search"
+            :disabled="!formCompleted || searching"
+            class="primary disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            Verificar Linhas
+          </button>
+          <button @click="abortSearch" class="text-red-500" v-if="searching">
+            Cancelar
+          </button>
+        </div>
         <div>
           <SelectAjaxVue
             :disabled="searching"
@@ -96,6 +101,7 @@ const searchResult = ref([]);
 const downLink = ref("");
 const timerId = ref(-1);
 const timer = ref(0);
+let controller;
 
 // const linkUrl = import.meta.env.VITE_MONOLITH_URL;
 
@@ -108,10 +114,20 @@ const search = async () => {
     // const formattedTime = formatarTempoDecorrido(new Date());
     timer.value = formatarTempoDecorrido(now);
   }, 1);
+
+  // Cria um novo AbortController a cada requisição
+  controller = new AbortController();
+
   try {
-    const res = await api.post("admin/chip/buscar", {
-      ...verify.value,
-    });
+    const res = await api.post(
+      "admin/chip/buscar",
+      {
+        ...verify.value,
+      },
+      {
+        signal: controller.signal,
+      }
+    );
     downLink.value = res.data.downLink;
     searchResult.value = res.data.result;
   } catch (error) {
@@ -128,6 +144,12 @@ const search = async () => {
 
   clearInterval(timerId.value);
   searching.value = false;
+};
+
+const abortSearch = () => {
+  if (controller) {
+    controller.abort();
+  }
 };
 
 const checkedRows = ref();
