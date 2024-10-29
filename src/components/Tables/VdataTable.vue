@@ -54,6 +54,14 @@
         }}</span>
         <!-- <span>{{ item.ultimoAcesso }}</span> -->
       </template>
+      <!-- Customização do campo de último acesso -->
+      <template v-slot:item.conexao="{ item }">
+        <span>{{
+          String(item.conexao).charAt(0) +
+          String(item.conexao).slice(1).toLowerCase()
+        }}</span>
+        <!-- <span>{{ item.ultimoAcesso }}</span> -->
+      </template>
 
       <!-- <template v-slot:item.actions="{ item }">
           <v-btn @click="editItem(item)">Editar</v-btn>
