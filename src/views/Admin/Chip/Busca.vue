@@ -1,7 +1,7 @@
 <template>
   <DashboardLayout>
-    <div v-if="timerId > -1" class="px-2 pt-0">
-      <span>{{ timer }}</span>
+    <div class="px-2 pt-0">
+      <span>{{ timer || "&nbsp" }}</span>
     </div>
     <div class="grid grid-cols-2" v-if="!searchResult.length">
       <div>
