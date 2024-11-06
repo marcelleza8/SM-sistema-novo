@@ -1,26 +1,11 @@
 <template>
   <v-container fluid>
-    <v-data-table
-      v-model="selectedItems"
-      :headers="headers"
-      :items="filteredItems"
-      :search="search"
-      :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
-      return-object
-      show-select
-      class="elevation-1"
-      :mobile="null"
-      :mobile-breakpoint="'sm'"
-      :loading-text="'Buscando linhas da sua conta'"
-      @update:model-value="onSelectionChange"
-    >
+    <v-data-table v-model="selectedItems" :headers="headers" :items="filteredItems" :search="search"
+      :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" return-object show-select class="elevation-1" :mobile="null"
+      :mobile-breakpoint="'sm'" :loading-text="'Buscando linhas da sua conta'" @update:model-value="onSelectionChange">
       <template v-slot:top>
         <div class="flex justify-between px-2">
-          <div
-            class="font-bold text-blue-800 dark:text-blue-400"
-            v-if="selectedItems.length"
-          >
+          <div class="font-bold text-blue-800 dark:text-blue-400" v-if="selectedItems.length">
             <span>{{ selectedItems.length }}</span>
             Selecionados
           </div>
@@ -31,11 +16,7 @@
             resultados
           </div>
         </div>
-        <v-text-field
-          v-model="search"
-          label="Pesquise por linha ou ICCID"
-          clearable
-        ></v-text-field>
+        <v-text-field v-model="search" label="Pesquise por linha ou ICCID" clearable></v-text-field>
       </template>
 
       <!-- Customização do campo de consumo total -->
@@ -110,7 +91,7 @@ const headers = ref([
   },
   {
     title: "SMS",
-    value: "sms",
+    value: "consumoSMS",
     sortable: true,
     nowrap: true,
   },
