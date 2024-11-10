@@ -13,6 +13,9 @@
         :to="{ name: 'AdminChipListPage' }"
         >Lista de Chip</RouterLink
       >
+      <RouterLink :to="{ name: 'AdminOperadoraListPage' }"
+        >Operadoras</RouterLink
+      >
     </div>
   </DashboardLayout>
 </template>
