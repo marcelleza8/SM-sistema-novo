@@ -49,28 +49,27 @@
       <div class="result-control">
         <div class="text-sm">
           <div class="flex justify-evenly border border-gray-500 py-2">
-            <button
+            <v-btn
+              color="green-lighten-2"
               :disabled="searching"
               class="bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400 disabled:bg-gray-500"
               @click="reset"
             >
               Nova consulta
-            </button>
-            <button
-              :disabled="searching"
-              class="bg-orange-100 text-orange-800 dark:bg-gray-700 dark:text-orange-400 border border-orange-400 disabled:bg-gray-500"
-              @click="edit"
-            >
+            </v-btn>
+            <v-btn color="orange" :disabled="searching" @click="edit">
               Editar dados da consulta atual
-            </button>
-            <button
-              :disabled="searching"
-              class="bg-yellow-100 text-yellow-800 dark:bg-gray-700 dark:text-yellow-400 border border-yellow-400 disabled:bg-gray-500"
-              @click="search"
-            >
+            </v-btn>
+            <v-btn color="green" :disabled="searching" @click="search">
               Recarregar consulta atual
-            </button>
+            </v-btn>
             <DropDown @exportSelected="exportSelected"></DropDown>
+            <v-btn
+              @click="exportCSV"
+              :disabled="!checkedRows?.length"
+              color="blue"
+              >Exportar selecionados</v-btn
+            >
           </div>
         </div>
       </div>
@@ -90,7 +89,7 @@ import BuscaChipverifier from "../../../components/BuscaChipVerifier.vue";
 import DropDown from "../../../components/DropDown.vue";
 import VdataTable from "../../../components/Tables/VdataTable.vue";
 import ChipChangeStatus from "../../../components/ChipChangeStatus.vue";
-import { handler } from "@tailwindcss/aspect-ratio";
+import { useHumanReadableBytes } from "../../../composable/useHumanReadableBytes";
 const verify = ref({
   client: null,
 });
@@ -103,7 +102,54 @@ const timerId = ref(-1);
 const timer = ref(0);
 let controller;
 
-// const linkUrl = import.meta.env.VITE_MONOLITH_URL;
+const headers = ref([
+  { title: "Cliente", value: "cliente", sortable: true, nowrap: true },
+  { title: "Linha", value: "linha", sortable: true, nowrap: true },
+  { title: "ICCID", value: "iccid", sortable: true, nowrap: true },
+  { title: "Status", value: "status", sortable: true, nowrap: true },
+  {
+    title: "Plano",
+    value: "plano",
+    sortable: true,
+    nowrap: true,
+  },
+  { title: "Operadora", value: "operadora", sortable: true, nowrap: true },
+  {
+    title: "Último Acesso",
+    value: "ultimoAcesso",
+    sortable: true,
+    nowrap: true,
+  },
+  { title: "Conexão", value: "conexao", sortable: true, nowrap: true },
+  {
+    title: "Consumo Total",
+    value: "consumoTotal",
+    sortable: true,
+    nowrap: true,
+  },
+  {
+    title: "SMS",
+    value: "consumoSMS",
+    sortable: true,
+    nowrap: true,
+  },
+  {
+    title: "IMEI Dispositivo",
+    value: "imeiAparelho",
+    sortable: true,
+    nowrap: true,
+  },
+  { title: "Rede", value: "rede", sortable: true, nowrap: true },
+  { title: "Tecnologia", value: "tecnologia", sortable: true, nowrap: true },
+  { title: "APN", value: "apn", sortable: true, nowrap: true },
+  {
+    title: "Status na operadora",
+    value: "statusOperadora",
+    sortable: true,
+    nowrap: true,
+  },
+  { title: "Ações", value: "actions", sortable: false, nowrap: true },
+]);
 
 const search = async () => {
   searching.value = true;
@@ -229,6 +275,50 @@ function handleChangedStatus(data) {
     search();
   }
 }
+
+// Função para exportar os dados como CSV
+const exportCSV = () => {
+  const filteredHeaders = headers.value.filter(
+    (header) => header.value != "actions"
+  );
+
+  const csvContent = [
+    filteredHeaders.map((header) => header.title).join(";"),
+    checkedRows.value
+      .map((item) =>
+        filteredHeaders
+          .map((header) => {
+            let value = item[header.value] ?? "";
+
+            if (["linha", "iccid", "imeiAparelho"].includes(header.value)) {
+              return `="${value}"`;
+            } else if (
+              ["consumoTotal", "consumoDiario"].includes(header.value)
+            ) {
+              return useHumanReadableBytes().formatBytes(Number(value), "MB");
+            }
+            return value;
+          })
+          .join(";")
+      )
+      .join("\n"), // Linhas
+  ].join("\n");
+
+  // Adiciona o BOM ao início do conteúdo CSV
+  const bom = "\uFEFF";
+  const fullCsvContent = bom + csvContent;
+
+  // Cria um blob com o conteúdo CSV
+  const blob = new Blob([fullCsvContent], { type: "text/csv;charset=utf-8;" });
+
+  // Cria um link temporário para fazer o download do arquivo
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute("download", "data.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 </script>
 
 <style scoped>

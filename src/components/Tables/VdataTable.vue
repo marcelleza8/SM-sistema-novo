@@ -1,54 +1,97 @@
 <template>
   <v-container fluid>
-    <v-data-table v-model="selectedItems" :headers="headers" :items="filteredItems" :search="search"
-      :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" return-object show-select class="elevation-1" :mobile="null"
-      :mobile-breakpoint="'sm'" :loading-text="'Buscando linhas da sua conta'" @update:model-value="onSelectionChange">
-      <template v-slot:top>
-        <div class="flex justify-between px-2">
-          <div class="font-bold text-blue-800 dark:text-blue-400" v-if="selectedItems.length">
-            <span>{{ selectedItems.length }}</span>
-            Selecionados
-          </div>
-          <div>
-            Mostrando
-            <span class="text-orange-800">{{ filteredItems.length }}</span> de
-            <span class="text-green-800">{{ items.length }}</span>
-            resultados
-          </div>
-        </div>
-        <v-text-field v-model="search" label="Pesquise por linha ou ICCID" clearable></v-text-field>
-      </template>
+    <v-row>
+      <v-col>
+        <v-select
+          v-model="selectedOperadora"
+          :items="uniqueOperadoras"
+          label="Filtrar por Operadora"
+          multiple
+          chips
+        ></v-select>
 
-      <!-- Customização do campo de consumo total -->
-      <template v-slot:item.consumoTotal="{ item }">
-        {{
-          item.consumoTotal
-            ? useHumanReadableBytes().formatBytes(item.consumoTotal, "MB")
-            : ""
-        }}
-      </template>
+        <v-select
+          v-model="selectedPlano"
+          :items="uniquePlanos"
+          label="Filtrar por Plano"
+          multiple
+          chips
+        ></v-select>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-data-table
+          v-model="selectedItems"
+          :headers="headers"
+          :items="filteredItems"
+          :search="search"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          return-object
+          show-select
+          class="elevation-1"
+          :mobile="null"
+          :mobile-breakpoint="'sm'"
+          :loading-text="'Buscando linhas da sua conta'"
+          @update:model-value="onSelectionChange"
+        >
+          <template v-slot:top>
+            <div class="flex justify-between px-2">
+              <div
+                class="font-bold text-blue-800 dark:text-blue-400"
+                v-if="selectedItems.length"
+              >
+                <span>{{ selectedItems.length }}</span>
+                Selecionados
+              </div>
+              <div>
+                Mostrando
+                <span class="text-orange-800">{{ filteredItems.length }}</span>
+                de
+                <span class="text-green-800">{{ items.length }}</span>
+                resultados
+              </div>
+            </div>
+            <v-text-field
+              v-model="search"
+              label="Pesquise por linha ou ICCID"
+              clearable
+            ></v-text-field>
+          </template>
 
-      <!-- Customização do campo de último acesso -->
-      <template v-slot:item.ultimoAcesso="{ item }">
-        <span :title="dateUtils.timeAgo(item?.ultimoAcesso || '')">{{
-          dateUtils.formatDate(item?.ultimoAcesso || "", "dd/MM/yyyy HH:mm")
-        }}</span>
-        <!-- <span>{{ item.ultimoAcesso }}</span> -->
-      </template>
-      <!-- Customização do campo de último acesso -->
-      <template v-slot:item.conexao="{ item }">
-        <span>{{
-          String(item.conexao).charAt(0) +
-          String(item.conexao).slice(1).toLowerCase()
-        }}</span>
-        <!-- <span>{{ item.ultimoAcesso }}</span> -->
-      </template>
+          <!-- Customização do campo de consumo total -->
+          <template v-slot:item.consumoTotal="{ item }">
+            {{
+              item.consumoTotal
+                ? useHumanReadableBytes().formatBytes(item.consumoTotal, "MB")
+                : ""
+            }}
+          </template>
 
-      <!-- <template v-slot:item.actions="{ item }">
-          <v-btn @click="editItem(item)">Editar</v-btn>
-          <v-btn @click="deleteItem(item)">Excluir</v-btn>
-        </template> -->
-    </v-data-table>
+          <!-- Customização do campo de último acesso -->
+          <template v-slot:item.ultimoAcesso="{ item }">
+            <span :title="dateUtils.timeAgo(item?.ultimoAcesso || '')">{{
+              dateUtils.formatDate(item?.ultimoAcesso || "", "dd/MM/yyyy HH:mm")
+            }}</span>
+            <!-- <span>{{ item.ultimoAcesso }}</span> -->
+          </template>
+          <!-- Customização do campo de último acesso -->
+          <template v-slot:item.conexao="{ item }">
+            <span>{{
+              String(item.conexao).charAt(0) +
+              String(item.conexao).slice(1).toLowerCase()
+            }}</span>
+            <!-- <span>{{ item.ultimoAcesso }}</span> -->
+          </template>
+
+          <!-- <template v-slot:item.actions="{ item }">
+              <v-btn @click="editItem(item)">Editar</v-btn>
+              <v-btn @click="deleteItem(item)">Excluir</v-btn>
+            </template> -->
+        </v-data-table>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -120,6 +163,17 @@ const sortDesc = ref(false);
 
 const selectedItems = ref([]);
 
+const selectedOperadora = ref([]);
+const selectedPlano = ref([]);
+
+// Valores únicos para cada filtro (para exibir nos selects)
+const uniqueOperadoras = computed(() =>
+  Array.from(new Set([...props.items].map((item) => item.operadora)))
+);
+const uniquePlanos = computed(() =>
+  Array.from(new Set([...props.items].map((item) => item.plano)))
+);
+
 // Atualiza a lista de selecionados e emite o evento para o pai
 const onSelectionChange = (newSelection) => {
   emit("update:selected", selectedItems.value);
@@ -128,6 +182,15 @@ const onSelectionChange = (newSelection) => {
 // Filtrar e ordenar os itens
 const filteredItems = computed(() => {
   let filtered = [...props.items];
+
+  filtered = filtered.filter((item) => {
+    return (
+      (selectedOperadora.value.length === 0 ||
+        selectedOperadora.value.includes(item.operadora)) &&
+      (selectedPlano.value.length === 0 ||
+        selectedPlano.value.includes(item.plano))
+    );
+  });
 
   if (search.value) {
     filtered = filtered.filter((item) =>
