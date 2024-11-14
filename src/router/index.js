@@ -6,6 +6,7 @@ import Busca from "../views/Admin/Chip/Busca.vue";
 import Dashboard from "../views/Dashboard.vue";
 import AdminChipListPage from "../views/Admin/Chip/Manage/List.vue";
 import AdminOperadoraListPage from "../views/Admin/Operator/ListAll.vue";
+import AdminOperadoraPlanosListPage from "../views/Admin/OperatorPlans/ListAll.vue";
 
 const routes = [
   {
@@ -50,7 +51,14 @@ const routes = [
       authenticated: true,
     },
   },
-  // outras rotas...
+  {
+    path: "/admin/planos/",
+    name: "AdminOperadoraPlanosListPage",
+    component: AdminOperadoraPlanosListPage,
+    meta: {
+      authenticated: true,
+    },
+  },
 ];
 
 const router = createRouter({

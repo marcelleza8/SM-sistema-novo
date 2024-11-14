@@ -51,7 +51,6 @@ const operadora = ref({
   title: "",
   sim_price: 0,
 });
-const regions = ["Sudeste", "Nordeste", "Centro-Oeste", "Sul", "Norte"];
 
 const props = defineProps({
   modelValue: Boolean,
