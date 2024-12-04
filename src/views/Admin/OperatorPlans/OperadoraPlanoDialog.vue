@@ -7,45 +7,35 @@
 
       <v-card-text>
         <v-form ref="form">
-          <v-text-field
-            v-model="plano.name"
-            label="Título do plano"
-            :loading="loading"
-            :disabled="loading"
-            required
-          ></v-text-field>
-          <v-select
-            label="Operadora"
-            :disabled="loading || !operadoras?.length"
-            v-model="plano.operator_id"
-            :items="operadoras"
-          ></v-select>
-          <v-text-field
-            label="Dia de início do ciclo"
-            :loading="loading"
-            :disabled="loading"
-            v-model="plano.day_cycle_start"
-          ></v-text-field>
-          <v-text-field
-            label="Dia de fim do ciclo"
-            :loading="loading"
-            :disabled="loading"
-            v-model="plano.day_cycle_end"
-          ></v-text-field>
-          <v-text-field
-            label="Consumo em MB"
-            :loading="loading"
-            :disabled="loading"
-            v-model="plano.consumo_em_mb"
-          ></v-text-field>
-          <v-money-field
-            v-model="plano.excess_price"
-            label="Preço por SIM excedente"
-            prefix="R$"
-            :loading="loading"
-            :disabled="loading"
-            required
-          ></v-money-field>
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="plano.name"
+                label="Título do plano"
+                :loading="loading"
+                :disabled="loading"
+                required
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-select
+                label="Operadora"
+                :disabled="loading || !operadoras?.length"
+                v-model="plano.operator_id"
+                :items="operadoras"
+              ></v-select>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="Consumo em MB"
+                :loading="loading"
+                :disabled="loading"
+                v-model="plano.consumo_em_mb"
+              ></v-text-field>
+            </v-col>
+          </v-row>
         </v-form>
       </v-card-text>
 
@@ -60,7 +50,6 @@
 
 <script setup>
 import { ref, watch, computed, onMounted } from "vue";
-import VMoneyField from "../../../components/VMoneyField.vue";
 import api from "../../../api";
 
 const isOpen = ref(false);

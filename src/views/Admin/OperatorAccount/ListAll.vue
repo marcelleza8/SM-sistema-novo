@@ -3,11 +3,11 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-text-field v-model="search" label="Buscar plano" />
+          <v-text-field v-model="search" label="Buscar conta" />
         </v-col>
         <v-col class="d-flex justify-end">
           <v-btn v-if="false" @click="openDialog(null)" color="primary"
-            >Adicionar Operadora</v-btn
+            >Adicionar Conta</v-btn
           >
         </v-col>
       </v-row>
@@ -29,7 +29,7 @@
           </v-btn>
         </template>
       </v-data-table>
-      <OperadoraPlanoDialog :toEdit="selectedToEdit" v-model="formDialog" />
+      <OperadoraContaDialog :toEdit="selectedToEdit" v-model="formDialog" />
     </v-container>
   </DashboardLayout>
 </template>
@@ -37,28 +37,29 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
-import OperadoraPlanoDialog from "./OperadoraPlanoDialog.vue";
+import OperadoraContaDialog from "./OperadoraContaDialog.vue";
 import api from "../../../api";
 
 const search = ref("");
 const selectedToEdit = ref(null);
 const formDialog = ref(false);
 const headers = [
-  { title: "Título", value: "name", sortable: true },
+  { title: "Plano Conta", value: "codigo", sortable: true },
+  { title: "Total de SIM", value: "totalSIMs", sortable: true },
   { title: "Ação", value: "acao", sortable: false },
 ];
 
-const planos = ref([]);
+const contas = ref([]);
 
 const filteredPlanos = computed(() => {
-  if (!search.value) return planos.value;
-  return planos.value.filter((operadora) =>
+  if (!search.value) return contas.value;
+  return contas.value.filter((operadora) =>
     operadora.name.toLowerCase().includes(search.value.toLowerCase())
   );
 });
 
-function openDialog(id = null) {
-  selectedToEdit.value = id;
+function openDialog(conta) {
+  selectedToEdit.value = conta;
   formDialog.value = true;
 }
 
@@ -71,8 +72,8 @@ function confirmDelete(item) {
 }
 
 onMounted(async () => {
-  const response = await api.get("admin/planos");
+  const response = await api.get("admin/contas");
 
-  planos.value = response.data.planos;
+  contas.value = response.data.contas;
 });
 </script>
