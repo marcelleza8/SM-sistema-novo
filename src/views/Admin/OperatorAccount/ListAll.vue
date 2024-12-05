@@ -44,7 +44,7 @@ const search = ref("");
 const selectedToEdit = ref(null);
 const formDialog = ref(false);
 const headers = [
-  { title: "Plano Conta", value: "codigo", sortable: true },
+  { title: "Plano Conta", value: "title", sortable: true },
   { title: "Total de SIM", value: "totalSIMs", sortable: true },
   { title: "Ação", value: "acao", sortable: false },
 ];

@@ -11,7 +11,7 @@
             <v-col cols="12" md="6">
               <v-text-field
                 label="Plano"
-                v-model="formData.planoNome"
+                v-model="formData.plan_name"
                 outlined
                 dense
               ></v-text-field>
@@ -19,7 +19,7 @@
             <v-col cols="12" md="6">
               <v-text-field
                 label="Código"
-                v-model="formData.codigo"
+                v-model="formData.code"
                 outlined
                 dense
               ></v-text-field>
@@ -29,7 +29,7 @@
             <v-col cols="12" md="4">
               <v-text-field
                 label="consumo em Mb"
-                v-model="formData.consumoMb"
+                v-model="formData.consumo_em_mb"
                 outlined
                 dense
               ></v-text-field>
@@ -40,7 +40,7 @@
                 :items="operadoras"
                 item-value="value"
                 item-text="name"
-                v-model="formData.operadora_id"
+                v-model="formData.operator_id"
                 outlined
                 dense
               ></v-select>
@@ -58,7 +58,7 @@
             <v-col cols="12" md="6">
               <v-text-field
                 label="Usuário"
-                v-model="formData.usuario"
+                v-model="formData.user"
                 outlined
                 dense
               ></v-text-field>
@@ -66,7 +66,7 @@
             <v-col cols="12" md="6">
               <v-text-field
                 label="Senha"
-                v-model="formData.senha"
+                v-model="formData.password"
                 outlined
                 dense
               ></v-text-field>
@@ -75,9 +75,9 @@
           <v-row>
             <v-col cols="12" md="4">
               <v-money-field
-                label="Preço por SIM excedente"
+                label="Excedentes na conta"
                 prefix="R$"
-                v-model="formData.plan_price"
+                v-model="formData.excess_price"
                 :loading="loading"
                 :disabled="loading"
                 required
@@ -123,13 +123,13 @@ const operadoras = ref([]);
 const formId = ref(null);
 
 const formData = ref({
-  planoNome: null,
-  codigo: null,
-  consumoMb: null,
-  operadora_id: null,
+  plan_name: null,
+  code: null,
+  consumo_em_mb: null,
+  operator_id: null,
   apn: null,
-  usuario: null,
-  senha: null,
+  user: null,
+  password: null,
   excess_price: 0,
   day_cycle_start: null,
   day_cycle_end: null,
@@ -154,7 +154,7 @@ watch(
 );
 
 /* const operas = computed(() =>
-  operadoras.filter((i) => (i.id = formData.operadora_id))
+  operadoras.filter((i) => (i.id = formData.operator_id))
 ); */
 
 const dialogTitle = computed(() =>
@@ -169,13 +169,13 @@ async function loadConta(toEdit) {
   const conta = response.data.contas;
 
   formData.value = {
-    planoNome: conta.planoNome,
-    codigo: conta.codigo,
-    consumoMb: conta.consumoMb,
-    operadora_id: conta.operadora_id,
+    plan_name: conta.plan_name,
+    code: conta.code,
+    consumo_em_mb: conta.consumo_em_mb,
+    operator_id: conta.operator_id,
     apn: conta.apn,
-    usuario: conta.usuario,
-    senha: conta.senha,
+    user: conta.user,
+    password: conta.password,
     excess_price: conta.excess_price,
     day_cycle_start: conta.day_cycle_start,
     day_cycle_end: conta.day_cycle_end,
@@ -195,9 +195,8 @@ function closeDialog() {
 
 async function save() {
   loading.value = true;
-  console.log({ ...plano.value });
   const response = await api.put(
-    `/admin/planos/${formId.value}`,
+    `/admin/contas/${props.toEdit.id}`,
     formData.value
   );
 
