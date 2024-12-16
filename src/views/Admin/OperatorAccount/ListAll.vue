@@ -15,9 +15,11 @@
       <v-data-table
         :headers="headers"
         :items="filteredPlanos"
+        :loading="loadingTable"
         :search="search"
-        class="elevation-1"
         :items-per-page="10"
+        class="elevation-1"
+        loading-text="Buscando as contas de operadoras"
         item-value="id"
       >
         <template v-slot:item.acao="{ item }">
@@ -43,6 +45,7 @@ import api from "../../../api";
 const search = ref("");
 const selectedToEdit = ref(null);
 const formDialog = ref(false);
+const loadingTable = ref(false);
 const headers = [
   { title: "Plano Conta", value: "title", sortable: true },
   {
@@ -77,7 +80,9 @@ function confirmDelete(item) {
 }
 
 onMounted(async () => {
+  loadingTable.value = true;
   const response = await api.get("admin/contas");
+  loadingTable.value = false;
 
   contas.value = response.data.contas;
 });
