@@ -195,23 +195,36 @@ function closeDialog() {
 
 async function save() {
   loading.value = true;
+  formData.value.day_cycle_start = formData.value.day_cycle_start
+    ? +formData.value.day_cycle_start
+    : null;
+  formData.value.day_cycle_end = formData.value.day_cycle_end
+    ? +formData.value.day_cycle_end
+    : null;
+
   const response = await api.put(
     `/admin/contas/${props.toEdit.id}`,
     formData.value
   );
 
   if (response.data.status) {
+    fetch();
     closeDialog();
   }
   loading.value = false;
 }
 
-onMounted(async () => {
+const fetch = async () => {
+  loading.value = true;
   const response = await api.get("admin/operadoras");
-
   operadoras.value = response.data.operadoras.map((p) => ({
     title: p.name,
     value: p.id,
   }));
+  loading.value = false;
+};
+
+onMounted(async () => {
+  await fetch();
 });
 </script>
