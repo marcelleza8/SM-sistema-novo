@@ -26,10 +26,12 @@
           :headers="headers"
           :items="filteredItems"
           :search="search"
+          dense
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           return-object
           show-select
+          show-expand
           class="elevation-1"
           :mobile="null"
           :mobile-breakpoint="'sm'"
@@ -76,13 +78,17 @@
             }}</span>
             <!-- <span>{{ item.ultimoAcesso }}</span> -->
           </template>
+
           <!-- Customização do campo de último acesso -->
           <template v-slot:item.conexao="{ item }">
             <span>{{
               String(item.conexao).charAt(0) +
               String(item.conexao).slice(1).toLowerCase()
             }}</span>
-            <!-- <span>{{ item.ultimoAcesso }}</span> -->
+          </template>
+
+          <template v-slot:expanded-row="{ columns, item }">
+            <ConsumosTable :item="item" :columns="columns" />
           </template>
 
           <!-- <template v-slot:item.actions="{ item }">
@@ -99,6 +105,7 @@
 import { ref, computed } from "vue";
 import { useHumanReadableBytes } from "../../composable/useHumanReadableBytes";
 import { useDateUtils } from "../../composable/useDateUtils";
+import ConsumosTable from "../ConsumosTable.vue";
 
 // Define o método emit para comunicar com o componente pai
 const emit = defineEmits(["update:selected"]);
@@ -108,6 +115,7 @@ const props = defineProps({
 });
 
 const headers = ref([
+  { title: "", value: "data-table-expand", width: "1%" }, // Coluna para expandir
   { title: "Cliente", value: "cliente", sortable: true, nowrap: true },
   { title: "Linha", value: "linha", sortable: true, nowrap: true },
   { title: "ICCID", value: "iccid", sortable: true, nowrap: true },
