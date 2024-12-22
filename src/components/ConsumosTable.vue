@@ -7,12 +7,11 @@
         hide-actions
         item-key="data"
         class="elevation-1"
-        hide-default-footer
         :loading="loadingData"
-        :items="consumptionItems"
+        :items="filteredConsumptionItems"
         pagination.sync="pagination"
         :headers="[
-          { title: 'Consumo', value: 'consumo_total_MB' },
+          { title: 'Consumo em MB', value: 'consumo_total_MB' },
           { title: 'Data de criação', value: 'created_at' },
         ]"
       >
@@ -20,19 +19,57 @@
           <div class="text-blue-800 font-bold text-center">
             Tabela de Consumos
           </div>
+          <v-text-field
+            :color="isRegexValid ? 'green' : 'red'"
+            v-model="search"
+            label="Pesquise por consumo ou data de criação"
+            clearable
+          ></v-text-field>
         </template>
       </v-data-table>
     </td>
   </tr>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import api from "../api";
 
 const props = defineProps({ columns: Array, item: Array });
 
-const consumptionItems = ref([]);
+const search = ref("");
+const isRegexValid = ref(true); // Indica se o Regex é válido
 const loadingData = ref(false);
+const consumptionItems = ref([]);
+
+const filteredConsumptionItems = computed(() => {
+  isRegexValid.value = true; // Regex é válido porque não foi aplicado
+  const searchTerm = search.value?.trim();
+
+  if (!searchTerm) {
+    return consumptionItems.value; // Retorna todos os itens se não houver busca
+  }
+
+  try {
+    // Criar uma expressão regular a partir do termo de busca
+    const regex = new RegExp(
+      searchTerm, // Substituir `*` por `.*` para wildcard
+      "i" // Case-insensitive
+    );
+
+    // Filtrar itens que atendam ao regex em ambas as colunas
+    return consumptionItems.value.filter((item) => {
+      const consumo = item.consumo_total_MB.toString(); // Garantir que é string
+      const data = item.created_at; // Garantir que data é string
+      return regex.test(consumo) || regex.test(data);
+    });
+  } catch (e) {
+    isRegexValid.value = false;
+    console.error("Erro ao construir o RegEx:");
+    // console.error(e); // ERROR
+
+    return consumptionItems.value; // Retorna todos os itens no caso de erro
+  }
+});
 
 const fetchConsumption = async () => {
   loadingData.value = true;
@@ -43,7 +80,6 @@ const fetchConsumption = async () => {
     consumptionItems.value = response.data;
   } catch (err) {}
   loadingData.value = false;
-  console.log(response);
 };
 
 onMounted(() => {
