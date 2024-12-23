@@ -23,6 +23,11 @@
         :to="{ name: 'AdminOperadoraAccountListPage' }"
         >Contas de operadora</RouterLink
       >
+      <RouterLink
+        class="px-8 py-7 bg-pink-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-30 border border-gray-100"
+        :to="{ name: 'AdminSystemJobsList' }"
+        >Jobs</RouterLink
+      >
     </div>
   </DashboardLayout>
 </template>

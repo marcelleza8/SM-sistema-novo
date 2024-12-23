@@ -1,22 +1,17 @@
 import { defineStore } from "pinia";
 import api from "../api";
-import useLocalStorage from "../composable/useLocalStorage"; // Importe o composable
+import useLocalStorage from "../composable/useLocalStorage";
 
-const localStorageHandler = useLocalStorage(); // Inicializa o composable
+const localStorageHandler = useLocalStorage();
 
 export const useAuthStore = defineStore("auth", {
-  state: () => ({
-    token: localStorageHandler.get("auth-token"),
-    isAuthenticated: !!localStorageHandler.get("auth-token"),
-  }),
   getters: {
     // Getter para verificar se o usuário está autenticado
-    isLoggedIn: (state) => !!state.token,
+    isLoggedIn: (state) => !!localStorageHandler.get("auth-token"),
+    token: (state) => localStorageHandler.get("auth-token"),
   },
   actions: {
     async login(credentials) {
-      // const localStorageHandler = useLocalStorage(); // Inicializa o composable
-
       // Faz a requisição para autenticação e obtenção do token
       const response = await api.post("/oauth/token", {
         ...credentials,
@@ -26,28 +21,21 @@ export const useAuthStore = defineStore("auth", {
         scope: import.meta.env.VITE_SCOPE,
       });
 
-      this.token = response.data.token;
-      this.isAuthenticated = true;
-
       // Armazena o token com uma expiração de 1 hora (60 minutos)
-      localStorageHandler.set("auth-token", this.token, 60); // Expira em 60 minutos
+      localStorageHandler.set("auth-token", response.data.token, 60);
 
       return response;
     },
     async logout() {
-      // const localStorageHandler = useLocalStorage(); // Inicializa o composable
       try {
         await api.post("/logout");
       } catch (error) {
-        throw "Erro ao logout";
+        // throw "Erro ao logout";
       }
-      localStorageHandler.clear("auth-token"); // Remove o token ao fazer logout
-      this.token = "";
-      this.isAuthenticated = false;
+      this.clear();
     },
     // Verifica se o token já expirou com base no "e" (expiração) do localStorage
     isTokenExpired() {
-      // const localStorageHandler = useLocalStorage();
       const storedToken = localStorageHandler.get("auth-token");
 
       if (!storedToken) return true; // Sem token, considera expirado
@@ -63,16 +51,14 @@ export const useAuthStore = defineStore("auth", {
     },
     // Inicializa o estado de autenticação com base no Local Storage
     initializeAuth() {
-      // const localStorageHandler = useLocalStorage(); // Inicializa o composable
-
       const token = localStorageHandler.get("auth-token"); // Recupera o token se ainda estiver válido
       if (token) {
-        this.token = token;
-        this.isAuthenticated = true;
       } else {
-        this.token = "";
-        this.isAuthenticated = false;
+        this.clear();
       }
+    },
+    clear() {
+      localStorageHandler.clear("auth-token"); // Remove o token ao fazer logout
     },
   },
 });

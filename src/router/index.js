@@ -8,66 +8,112 @@ import AdminChipListPage from "../views/Admin/Chip/Manage/List.vue";
 import AdminOperadoraListPage from "../views/Admin/Operator/ListAll.vue";
 import AdminOperadoraAccountListPage from "../views/Admin/OperatorAccount/ListAll.vue";
 import AdminOperadoraPlanosListPage from "../views/Admin/OperatorPlans/ListAll.vue";
+import AdminSystemJobsList from "../views/Admin/System/Jobs/JobsCreator.vue";
 
 const routes = [
   {
     path: "/",
     name: "Home",
-    // component: Home,
     redirect: { name: "Login" },
   },
   {
     path: "/login",
     name: "Login",
     component: Login,
-  },
-  {
-    path: "/admin/dashboad",
-    name: "Admin/Dashboard",
-    component: Dashboard,
     meta: {
-      authenticated: true,
+      requiresAuth: false, // Indica que não é necessário estar autenticado
+      title: "Login - Admin",
     },
   },
   {
-    path: "/admin/chip/busca",
-    name: "Admin/Chip/Busca",
-    component: Busca,
+    path: "/admin",
+    // component: AdminLayout, // Layout principal para rotas de admin
     meta: {
-      authenticated: true,
+      authenticated: true, // Requer autenticação
+      title: "Admin Dashboard",
     },
-  },
-  {
-    path: "/admin/chip/",
-    name: "AdminChipListPage",
-    component: AdminChipListPage,
-    meta: {
-      authenticated: true,
-    },
-  },
-  {
-    path: "/admin/operadoras/",
-    name: "AdminOperadoraListPage",
-    component: AdminOperadoraListPage,
-    meta: {
-      authenticated: true,
-    },
-  },
-  {
-    path: "/admin/planos/",
-    name: "AdminOperadoraPlanosListPage",
-    component: AdminOperadoraPlanosListPage,
-    meta: {
-      authenticated: true,
-    },
-  },
-  {
-    path: "/admin/contas/",
-    name: "AdminOperadoraAccountListPage",
-    component: AdminOperadoraAccountListPage,
-    meta: {
-      authenticated: true,
-    },
+    children: [
+      {
+        path: "dashboard",
+        name: "Admin/Dashboard",
+        component: Dashboard,
+        meta: {
+          title: "Dashboard - Admin",
+        },
+      },
+      {
+        path: "chip",
+        meta: {
+          title: "Chip Management - Admin",
+        },
+        children: [
+          {
+            path: "busca",
+            name: "Admin/Chip/Busca",
+            component: Busca,
+            meta: {
+              title: "Busca de Chips - Admin",
+            },
+          },
+          {
+            path: "",
+            name: "AdminChipListPage",
+            component: AdminChipListPage,
+            meta: {
+              title: "Lista de Chips - Admin",
+            },
+          },
+        ],
+      },
+      {
+        path: "operadoras",
+        meta: {
+          title: "Operadoras - Admin",
+        },
+        children: [
+          {
+            path: "",
+            name: "AdminOperadoraListPage",
+            component: AdminOperadoraListPage,
+            meta: {
+              title: "Lista de Operadoras - Admin",
+            },
+          },
+          {
+            path: "planos",
+            name: "AdminOperadoraPlanosListPage",
+            component: AdminOperadoraPlanosListPage,
+            meta: {
+              title: "Planos - Admin",
+            },
+          },
+          {
+            path: "contas",
+            name: "AdminOperadoraAccountListPage",
+            component: AdminOperadoraAccountListPage,
+            meta: {
+              title: "Contas - Admin",
+            },
+          },
+        ],
+      },
+      {
+        path: "system",
+        meta: {
+          title: "Sistema",
+        },
+        children: [
+          {
+            path: "jobs",
+            name: "AdminSystemJobsList",
+            component: AdminSystemJobsList,
+            meta: {
+              title: "Lista de Jobs",
+            },
+          },
+        ],
+      },
+    ],
   },
 ];
 

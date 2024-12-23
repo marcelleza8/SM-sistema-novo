@@ -1,5 +1,9 @@
 import axios from "axios";
 import { useAuthStore } from "./stores/authStore"; // Importe a store de autenticação
+import router from "./router";
+
+// Variável para evitar múltiplos redirecionamentos
+let isRedirecting = false;
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL, // Definindo a URL base da API
@@ -12,6 +16,7 @@ api.interceptors.request.use(
 
     // Verifica se o usuário está autenticado e se o token está disponível
     if (authStore.isLoggedIn) {
+      const authUser = authStore;
       config.headers.Authorization = `Bearer ${authStore.token}`; // Adiciona o token ao cabeçalho Authorization
     }
 
@@ -30,21 +35,26 @@ api.interceptors.response.use(
   async (error) => {
     const authStore = useAuthStore();
 
-    // Verifica se o erro é 401 (não autorizado, o que pode indicar token expirado)
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !authStore.isTokenExpired()
-    ) {
-      console.error("Token expirado ou inválido.");
-
-      // Chama o logout na store, removendo o token e deslogando o usuário
-      // await authStore.logout();
-
-      // Aqui você pode redirecionar o usuário para a página de login ou mostrar uma notificação
+    if (isRedirecting) {
+      return false;
     }
 
-    return Promise.reject(error); // Lida com outros erros
+    // Verifica se o erro é 401 (não autorizado, o que pode indicar token expirado)
+    if (
+      authStore.isTokenExpired() ||
+      (error.response && error.response.status === 401)
+    ) {
+      isRedirecting = true; // Evita redirecionar múltiplas vezes
+      await router.push({ name: "Login" });
+      isRedirecting = false;
+
+      // Chama o clear na store, removendo o token e deslogando o usuário
+      authStore.clear();
+    }
+
+    console.log("Erro na requisição", error.response.status);
+    return false;
+    // return Promise.reject(error); // Lida com outros erros
   }
 );
 
