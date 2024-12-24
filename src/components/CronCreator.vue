@@ -116,7 +116,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-container>
+  <v-container fluid>
     <v-card>
       <v-card-title> Agendar RPAs </v-card-title>
 
@@ -204,11 +204,16 @@ onMounted(() => {
             <tr v-for="item in items" :key="item._id">
               <td>{{ item.name }}</td>
               <td>{{ item.description }}</td>
-              <td>
-                <v-btn icon color="blue" @click="fetchJobDetails(item)">
+              <td class="whitespace-nowrap space-x-4">
+                <v-btn
+                  size="small"
+                  icon
+                  color="blue"
+                  @click="fetchJobDetails(item)"
+                >
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
-                <v-btn icon color="red" @click="deleteJob(item)">
+                <v-btn size="small" icon color="red" @click="deleteJob(item)">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </td>
