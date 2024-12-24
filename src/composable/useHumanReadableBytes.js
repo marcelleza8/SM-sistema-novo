@@ -17,7 +17,7 @@ export function useHumanReadableBytes() {
     }
 
     // Calcula o valor humanizado
-    const humanReadableValue = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
+    const humanReadableValue = parseFloat((bytes / Math.pow(k, i)).toFixed(3));
     return `${humanReadableValue} ${sizes[i]}`;
   };
 

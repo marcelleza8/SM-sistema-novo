@@ -13,6 +13,8 @@
         :headers="[
           { title: 'Consumo em MB', value: 'consumo_total_MB' },
           { title: 'Data de criação', value: 'created_at' },
+          { title: 'Último acesso', value: 'ultimo_acesso' },
+          { title: 'SMS Mensal', value: 'consumo_sms_mensal' },
         ]"
       >
         <template v-slot:top>
@@ -26,6 +28,16 @@
             clearable
           ></v-text-field>
         </template>
+        <template v-slot:item.created_at="{ item }">
+          <span :title="dateUtils.timeAgo(item?.created_at || '')">{{
+            dateUtils.formatDate(item?.created_at || "", "dd/MM/yyyy HH:mm")
+          }}</span>
+        </template>
+        <template v-slot:item.ultimo_acesso="{ item }">
+          <span :title="dateUtils.timeAgo(item?.ultimo_acesso || '')">{{
+            dateUtils.formatDate(item?.ultimo_acesso || "", "dd/MM/yyyy HH:mm")
+          }}</span>
+        </template>
       </v-data-table>
     </td>
   </tr>
@@ -33,6 +45,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import api from "../api";
+import { useDateUtils } from "../composable/useDateUtils";
 
 const props = defineProps({ columns: Array, item: Array });
 
@@ -40,6 +53,8 @@ const search = ref("");
 const isRegexValid = ref(true); // Indica se o Regex é válido
 const loadingData = ref(false);
 const consumptionItems = ref([]);
+
+const dateUtils = useDateUtils();
 
 const filteredConsumptionItems = computed(() => {
   isRegexValid.value = true; // Regex é válido porque não foi aplicado
