@@ -30,12 +30,15 @@
         </template>
         <template v-slot:item.created_at="{ item }">
           <span :title="dateUtils.timeAgo(item?.created_at || '')">{{
-            dateUtils.formatDate(item?.created_at || "", "dd/MM/yyyy HH:mm")
+            dateUtils.formatDate(item?.created_at || "", "dd/MM/yyyy HH:mm:ss")
           }}</span>
         </template>
         <template v-slot:item.ultimo_acesso="{ item }">
           <span :title="dateUtils.timeAgo(item?.ultimo_acesso || '')">{{
-            dateUtils.formatDate(item?.ultimo_acesso || "", "dd/MM/yyyy HH:mm")
+            dateUtils.formatDate(
+              item?.ultimo_acesso || "",
+              "dd/MM/yyyy HH:mm:ss"
+            )
           }}</span>
         </template>
       </v-data-table>
