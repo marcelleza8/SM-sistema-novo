@@ -79,7 +79,7 @@
             <!-- <span>{{ item.ultimoAcesso }}</span> -->
           </template>
 
-          <!-- Customização do campo de último acesso -->
+          <!-- Customização do campo de conexao -->
           <template v-slot:item.conexao="{ item }">
             <span>{{
               String(item.conexao).charAt(0) +

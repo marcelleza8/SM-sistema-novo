@@ -1,6 +1,6 @@
 <template>
   <tr>
-    <td colspan="5" class="pa-0">
+    <td colspan="7" class="pa-0">
       <v-data-table
         dense
         select-all
@@ -15,6 +15,7 @@
           { title: 'Data de criação', value: 'created_at' },
           { title: 'Último acesso', value: 'ultimo_acesso' },
           { title: 'SMS Mensal', value: 'consumo_sms_mensal' },
+          { title: 'IMEI Dispositivo', value: 'imei_aparelho' },
         ]"
       >
         <template v-slot:top>
@@ -101,8 +102,6 @@ const fetchConsumption = async () => {
 };
 
 onMounted(() => {
-  console.log("montado");
   fetchConsumption();
-  //
 });
 </script>
