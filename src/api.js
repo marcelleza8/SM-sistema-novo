@@ -12,6 +12,7 @@ const api = axios.create({
 // Interceptor de solicitações para adicionar o token
 api.interceptors.request.use(
   (config) => {
+    config.headers["X-Requested-With"] = "XMLHttpRequest";
     const authStore = useAuthStore(); // Acessa a store de autenticação
 
     // Verifica se o usuário está autenticado e se o token está disponível

@@ -9,6 +9,7 @@ import AdminOperadoraListPage from "../views/Admin/Operator/ListAll.vue";
 import AdminOperadoraAccountListPage from "../views/Admin/OperatorAccount/ListAll.vue";
 import AdminOperadoraPlanosListPage from "../views/Admin/OperatorPlans/ListAll.vue";
 import AdminSystemJobsList from "../views/Admin/System/Jobs/JobsCreator.vue";
+import ExcessConsumption from "../views/Admin/Reports/ExcessConsumption.vue";
 
 const routes = [
   {
@@ -109,6 +110,22 @@ const routes = [
             component: AdminSystemJobsList,
             meta: {
               title: "Lista de Jobs",
+            },
+          },
+        ],
+      },
+      {
+        path: "reports",
+        meta: {
+          title: "Relatorios",
+        },
+        children: [
+          {
+            path: "excess-consumption",
+            name: "ExcessConsumption",
+            component: ExcessConsumption,
+            meta: {
+              title: "Excesso de consumo",
             },
           },
         ],
