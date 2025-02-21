@@ -20,6 +20,11 @@
       >
       <RouterLink
         class="px-8 py-7 bg-pink-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-30 border border-gray-100"
+        :to="{ name: 'AdminChipListPage' }"
+        >SIM card</RouterLink
+      >
+      <RouterLink
+        class="px-8 py-7 bg-pink-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-30 border border-gray-100"
         :to="{ name: 'AdminOperadoraAccountListPage' }"
         >Contas de operadora</RouterLink
       >
@@ -28,11 +33,11 @@
         :to="{ name: 'AdminSystemJobsList' }"
         >Jobs</RouterLink
       >
-      <RouterLink
+      <!-- <RouterLink
         class="px-8 py-7 bg-pink-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-30 border border-gray-100"
         :to="{ name: 'ExcessConsumption' }"
         >Excesso de consumo de Chip</RouterLink
-      >
+      > -->
     </div>
   </DashboardLayout>
 </template>

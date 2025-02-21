@@ -5,7 +5,7 @@
         <th>Linha</th>
         <th>ICCD</th>
         <th>Status</th>
-        <th>Ações</th>
+        <th class="w-1 text-center">Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -13,9 +13,10 @@
         <td>{{ item.line }}</td>
         <td>{{ item.iccid }}</td>
         <td>{{ item.status }}</td>
-        <td>
-          <button>Editar</button>
-          <button>Excluir</button>
+        <td class="space-x-4 flex">
+          <v-spacer />
+          <v-btn size="small" color="green">Editar</v-btn>
+          <v-btn size="small" color="red">Excluir</v-btn>
         </td>
       </tr>
     </tbody>
