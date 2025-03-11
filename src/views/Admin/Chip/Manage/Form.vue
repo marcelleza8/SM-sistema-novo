@@ -59,11 +59,7 @@
               type="button"
               color="error"
               variant="outlined"
-              @click="
-                () => {
-                  emit('close', true);
-                }
-              "
+              @click="cancel"
               >Cancelar</v-btn
             >
             <v-spacer />
@@ -121,7 +117,7 @@ async function submitForm() {
       await api.post("/admin/chip", form);
     }
     if (!props.showOnlyContent) {
-      router.push({ name: "chipsList" });
+      router.push({ name: "AdminChipListPage" });
     }
   } catch (error) {
     console.error("Erro ao salvar:", error);
@@ -131,6 +127,13 @@ async function submitForm() {
     emit("close", true);
   }
 }
+
+const cancel = () => {
+  if (!props.showOnlyContent) {
+    router.push({ name: "AdminChipListPage" });
+  }
+  emit("close", true);
+};
 
 onMounted(async () => {
   const id = route.params.id ?? props.id;
