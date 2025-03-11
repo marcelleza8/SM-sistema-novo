@@ -12,7 +12,7 @@
         v-html="allowChange ? `Alterar plano` : `Selecione as linhas abaixo`"
       ></option>
       <option :value="plano.id" v-for="plano in contas">
-        {{ plano.title }}
+        {{ plano.name }}
       </option>
     </select>
     <!-- <v-btn
@@ -198,7 +198,7 @@ const onCloseDialog = () => {
 };
 
 onMounted(async () => {
-  const res = await api.get("admin/contas");
-  contas.value = res.data.contas;
+  const res = await api.get("admin/planos");
+  contas.value = res.data.planos;
 });
 </script>
