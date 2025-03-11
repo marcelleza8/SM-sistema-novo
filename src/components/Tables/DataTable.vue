@@ -15,7 +15,12 @@
         <td>{{ item.status }}</td>
         <td class="space-x-4 flex">
           <v-spacer />
-          <v-btn size="small" color="green">Editar</v-btn>
+          <v-btn
+            size="small"
+            :to="{ name: 'AdminChipEditFormPage', params: { id: item.id } }"
+            color="green"
+            >Editar</v-btn
+          >
           <v-btn size="small" color="red">Excluir</v-btn>
         </td>
       </tr>

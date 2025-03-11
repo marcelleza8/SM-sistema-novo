@@ -93,7 +93,7 @@ const props = defineProps({
   },
   showOnlyContent: {
     type: Boolean,
-    default: true,
+    default: false,
   },
 });
 
