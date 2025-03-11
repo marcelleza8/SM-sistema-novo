@@ -1,61 +1,101 @@
 <template>
   <v-text-field
-    v-model="formattedValue"
-    :prepend-inner-icon="prependIcon"
-    v-bind="$attrs"
-    @blur="updateInternalValue"
+    v-model="localValue"
+    @blur="onBlur"
+    @input="onInput"
+    :label="label"
   />
 </template>
 
-<script setup>
-import { ref, watch, computed } from "vue";
+<script lang="ts" setup>
+import { ref, watch } from "vue";
 
-// Props para passar e receber o valor
-const props = defineProps({
-  modelValue: {
-    type: Number,
-    default: 0,
-  },
-  prependIcon: {
-    type: String,
-    default: "R$",
-  },
-});
+interface Props {
+  modelValue: number;
+  label?: string;
+  prefix?: string;
+  suffix?: string;
+  thousands?: string;
+  decimal?: string;
+  precision?: number;
+  allowNegative?: boolean;
+}
 
-const emit = defineEmits(["update:modelValue"]);
+const props = defineProps<Props>();
+const emit = defineEmits<{ (e: "update:modelValue", value: number): void }>();
 
-// Valor formatado para exibição com máscara
-const formattedValue = ref(0);
+// Opções padrão (podem ser sobrescritas pelas props)
+const options = {
+  prefix: props.prefix || "",
+  suffix: props.suffix || "",
+  thousands: props.thousands || ",",
+  decimal: props.decimal || ".",
+  precision: props.precision ?? 2,
+  allowNegative: props.allowNegative ?? false,
+};
 
-// Atualiza o valor formatado quando `modelValue` muda
+// Valor local formatado a partir do modelValue
+const localValue = ref(format(props.modelValue));
+
+/**
+ * Formata o número de acordo com as opções definidas.
+ * Ex: 0.04 => "0.04" (ou com prefixo/sufixo se configurado)
+ */
+function format(num: number): string {
+  const negative = options.allowNegative && num < 0;
+  num = Math.abs(num);
+  const fixed = num.toFixed(options.precision);
+  const [integer, decimals] = fixed.split(".");
+  const integerFormatted = integer.replace(
+    /\B(?=(\d{3})+(?!\d))/g,
+    options.thousands
+  );
+  return `${negative ? "-" : ""}${options.prefix}${integerFormatted}${
+    options.decimal
+  }${decimals}${options.suffix}`;
+}
+
+/**
+ * Extrai somente os dígitos da string.
+ */
+function extractDigits(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
+/**
+ * Manipulador de input:
+ * - Extrai os dígitos digitados;
+ * - Converte para número dividindo por 10^precision (para interpretar como centavos);
+ * - Emite o modelValue e atualiza o valor formatado.
+ */
+function onInput(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const digits = extractDigits(target.value);
+  let num = 0;
+  if (digits !== "") {
+    num = parseInt(digits, 10) / Math.pow(10, options.precision);
+  }
+  emit("update:modelValue", num);
+  localValue.value = format(num);
+}
+
+/**
+ * Ao perder o foco, garante a formatação do valor.
+ */
+function onBlur() {
+  const digits = extractDigits(localValue.value);
+  let num = 0;
+  if (digits !== "") {
+    num = parseInt(digits, 10) / Math.pow(10, options.precision);
+  }
+  localValue.value = format(num);
+}
+
+// Atualiza o campo se o valor externo mudar
 watch(
   () => props.modelValue,
   (newVal) => {
-    formattedValue.value = formatDisplayValue(newVal);
-  },
-  { immediate: true }
+    localValue.value = format(newVal);
+  }
 );
-
-// Computed para formatar o valor para exibição com vírgula
-function formatDisplayValue(value) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "decimal",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
-
-// Atualiza o valor interno ao desfocar o campo, enviando com separador `.`.
-function updateInternalValue() {
-  const numericValue = parseFloat(
-    formattedValue.value.replace(/\./g, "").replace(",", ".")
-  );
-  emit("update:modelValue", numericValue);
-}
 </script>
-
-<style scoped>
-.v-text-field__prepend-inner-icon {
-  font-weight: bold;
-}
-</style>

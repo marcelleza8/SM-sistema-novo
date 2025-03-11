@@ -5,6 +5,7 @@ import Login from "../views/Login.vue";
 import Busca from "../views/Admin/Chip/Busca.vue";
 import Dashboard from "../views/Dashboard.vue";
 import AdminChipListPage from "../views/Admin/Chip/Manage/List.vue";
+import AdminChipFormPage from "../views/Admin/Chip/Manage/Form.vue";
 import AdminOperadoraListPage from "../views/Admin/Operator/ListAll.vue";
 import AdminOperadoraAccountListPage from "../views/Admin/OperatorAccount/ListAll.vue";
 import AdminOperadoraPlanosListPage from "../views/Admin/OperatorPlans/ListAll.vue";
@@ -62,6 +63,23 @@ const routes = [
             component: AdminChipListPage,
             meta: {
               title: "Lista de Chips - Admin",
+            },
+          },
+          {
+            path: "add",
+            name: "AdminChipAddFormPage",
+            component: AdminChipFormPage,
+            meta: {
+              title: "SIM Card - Admin",
+            },
+          },
+          {
+            path: "edit/:id",
+            name: "AdminChipEditFormPage",
+            component: AdminChipFormPage,
+            props: true,
+            meta: {
+              title: "SIM Card - Admin",
             },
           },
         ],

@@ -1,10 +1,11 @@
 <template>
-  <div class="relative">
+  <div class="relative inline-block">
     <button
       @click="toggleDropdown"
-      class="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-gray-700 dark:text-blue-400 border border-blue-400 rounded-md"
+      class="px-2 py-1 bg-blue-100 text-blue-800 border border-blue-400 rounded-md"
     >
       Exportar
+      <v-icon>mdi-menu-down</v-icon>
     </button>
     <div
       v-if="showDropdown"

@@ -8,15 +8,20 @@ import axios from "axios";
 import router from "./router";
 import { createPinia } from "pinia";
 import { createVuetify } from "vuetify";
+import { pt } from "vuetify/locale";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
-import { pt } from "vuetify/locale";
+
+import { VDateInput } from "vuetify/labs/components";
 
 const app = createApp(App);
 
 // Crie a instância do Vuetify
 const vuetify = createVuetify({
-  components,
+  components: {
+    ...components,
+    VDateInput,
+  },
   directives,
   locale: {
     locale: "pt",

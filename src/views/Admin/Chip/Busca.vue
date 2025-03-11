@@ -48,32 +48,69 @@
     <div v-else>
       <div class="result-control">
         <div class="text-sm">
-          <div class="flex justify-evenly border border-gray-500 py-2">
-            <v-btn
-              color="green-lighten-2"
-              :disabled="searching"
-              class="bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400 disabled:bg-gray-500"
-              @click="reset"
+          <div class="flex justify-between py-2">
+            <fieldset class="border border-gray-700 px-4 py-1 pb-4 space-x-4">
+              <legend class="font-semibold">CONSULTA</legend>
+              <v-btn
+                color="green-lighten-2"
+                :disabled="searching"
+                class="bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400 disabled:bg-gray-500"
+                @click="reset"
+                title="Faça uma nova consulta"
+              >
+                Nova
+              </v-btn>
+              <v-btn
+                color="orange"
+                title="Altere alguma informação da consulta atual"
+                :disabled="searching"
+                @click="edit"
+              >
+                Editar
+              </v-btn>
+              <v-btn
+                color="green"
+                :disabled="searching"
+                title="Refaz a consulta atual"
+                @click="search"
+              >
+                Atualizar
+              </v-btn>
+            </fieldset>
+            <fieldset class="border border-gray-700 px-4 py-1 pb-4 space-x-4">
+              <legend class="font-semibold">EXPORTAR</legend>
+              <DropDown @exportSelected="exportSelected"></DropDown>
+              <v-btn
+                @click="exportCSV"
+                :disabled="!checkedRows?.length"
+                color="blue"
+                :title="
+                  !checkedRows?.length
+                    ? `Selecione as linhas que quer exportar`
+                    : `Exporta as ${checkedRows?.length} linhas selecionadas abaixo`
+                "
+                >Exportar selecionados</v-btn
+              >
+            </fieldset>
+          </div>
+          <div class="flex justify-between py-2">
+            <fieldset
+              class="border border-gray-700 px-4 py-1 pb-4 space-x-4 w-full"
             >
-              Nova consulta
-            </v-btn>
-            <v-btn color="orange" :disabled="searching" @click="edit">
-              Editar dados da consulta atual
-            </v-btn>
-            <v-btn color="green" :disabled="searching" @click="search">
-              Recarregar consulta atual
-            </v-btn>
-            <DropDown @exportSelected="exportSelected"></DropDown>
-            <v-btn
-              @click="exportCSV"
-              :disabled="!checkedRows?.length"
-              color="blue"
-              >Exportar selecionados</v-btn
-            >
+              <legend class="font-semibold">Alterar SIM cards</legend>
+
+              <ChipChangeStatus
+                :items="checkedRows"
+                @changed="handleChangedStatus"
+              />
+              <ChipChangePlan
+                :items="checkedRows"
+                @changed="handleChangedPlan"
+              />
+            </fieldset>
           </div>
         </div>
       </div>
-      <ChipChangeStatus :items="checkedRows" @changed="handleChangedStatus" />
       <VdataTable :items="searchResult" v-model:selected="checkedRows" />
     </div>
   </DashboardLayout>
@@ -89,6 +126,7 @@ import BuscaChipverifier from "../../../components/BuscaChipVerifier.vue";
 import DropDown from "../../../components/DropDown.vue";
 import VdataTable from "../../../components/Tables/VdataTable.vue";
 import ChipChangeStatus from "../../../components/ChipChangeStatus.vue";
+import ChipChangePlan from "../../../components/ChipChangePlan.vue";
 import { useHumanReadableBytes } from "../../../composable/useHumanReadableBytes";
 const verify = ref({
   client: null,
@@ -262,6 +300,21 @@ const reset = () => {
 };
 
 function handleChangedStatus(data) {
+  if (data?.status) {
+    Swal.fire({
+      icon: "success",
+      timerProgressBar: true,
+      showConfirmButton: false,
+      timer: 3500,
+      toast: true,
+      position: "top-end",
+      title: "Status de chip alterado com sucesso",
+    });
+    search();
+  }
+}
+
+function handleChangedPlan(data) {
   if (data?.status) {
     Swal.fire({
       icon: "success",

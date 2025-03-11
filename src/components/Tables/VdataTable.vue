@@ -62,6 +62,16 @@
             ></v-text-field>
           </template>
 
+          <template #[`item.iccid`]="{ item }">
+            <v-btn
+              @click="openEditDialog(item.chipId)"
+              elevation="0"
+              variant="text"
+            >
+              {{ item.linha }}
+            </v-btn>
+          </template>
+
           <!-- Customização do campo de consumo total -->
           <template v-slot:item.consumoTotal="{ item }">
             {{
@@ -98,6 +108,22 @@
         </v-data-table>
       </v-col>
     </v-row>
+    <v-dialog v-model="editChipDialog" max-width="90%">
+      <v-card>
+        <v-card-title>Edição de Chip</v-card-title>
+        <v-card-text>
+          <AdminChipFormPage
+            :id="selectedChipIdToEdit"
+            showOnlyContent="true"
+            @close="
+              () => {
+                editChipDialog = false;
+              }
+            "
+          />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -106,6 +132,7 @@ import { ref, computed } from "vue";
 import { useHumanReadableBytes } from "../../composable/useHumanReadableBytes";
 import { useDateUtils } from "../../composable/useDateUtils";
 import ConsumosTable from "../ConsumosTable.vue";
+import AdminChipFormPage from "../../views/Admin/Chip/Manage/Form.vue";
 
 // Define o método emit para comunicar com o componente pai
 const emit = defineEmits(["update:selected"]);
@@ -169,6 +196,9 @@ const search = ref("");
 const sortBy = ref([{ key: "linha", order: "asc" }]);
 const sortDesc = ref(false);
 
+const editChipDialog = ref(false);
+const selectedChipIdToEdit = ref(0);
+
 const selectedItems = ref([]);
 
 const selectedOperadora = ref([]);
@@ -219,6 +249,11 @@ const filteredItems = computed(() => {
 
   return filtered;
 });
+
+const openEditDialog = (chipId) => {
+  selectedChipIdToEdit.value = chipId;
+  editChipDialog.value = true;
+};
 </script>
 
 <style>

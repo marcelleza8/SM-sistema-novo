@@ -1,13 +1,16 @@
 <template>
   <div class="flex flex-col h-screen">
     <!-- Cabeçalho -->
-    <header class="bg-blue-500 text-white p-4 flex justify-between">
+    <header
+      v-if="!showOnlyContent"
+      class="bg-blue-500 text-white p-4 flex justify-between"
+    >
       <RouterLink :to="{ name: 'Admin/Dashboard' }">{{ APPNAME }}</RouterLink>
       <span class="cursor-pointer" @click="logout">LOGOUT</span>
     </header>
 
     <!-- Menu Superior -->
-    <nav class="bg-gray-200 p-4">
+    <nav v-if="!showOnlyContent" class="bg-gray-200 p-4">
       <!-- Links do Menu -->
     </nav>
 
@@ -17,7 +20,10 @@
     </main>
 
     <!-- Rodapé -->
-    <footer class="bg-gray-500 text-white px-6 py-0.5 flex justify-end">
+    <footer
+      v-if="!showOnlyContent"
+      class="bg-gray-500 text-white px-6 py-0.5 flex justify-end"
+    >
       <div>V. {{ appVersion }}</div>
     </footer>
   </div>
@@ -29,6 +35,14 @@ import { useAuthStore } from "../stores/authStore";
 
 const APPNAME = import.meta.env.VITE_APPNAME;
 const appVersion = process.env.VUE_APP_VERSION;
+
+const props = defineProps({
+  showOnlyContent: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const router = useRouter();
 
 const logout = async () => {
