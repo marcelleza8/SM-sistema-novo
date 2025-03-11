@@ -62,14 +62,41 @@
             ></v-text-field>
           </template>
 
+          <template #[`item.linha`]="{ item }">
+            <div class="d-flex ga-2">
+              <v-btn density="compact" icon @click="copiarTexto(item.linha)">
+                <v-icon>mdi-clipboard-outline</v-icon>
+              </v-btn>
+              <v-btn
+                @click="openEditDialog(item.chipId)"
+                elevation="0"
+                class="pa-0"
+                variant="text"
+              >
+                {{ item.linha }}
+              </v-btn>
+            </div>
+          </template>
           <template #[`item.iccid`]="{ item }">
-            <v-btn
-              @click="openEditDialog(item.chipId)"
-              elevation="0"
-              variant="text"
-            >
-              {{ item.linha }}
-            </v-btn>
+            <div class="d-flex ga-2">
+              <v-btn
+                class="pa-0"
+                density="compact"
+                icon
+                @click="copiarTexto(item.iccid)"
+              >
+                <v-icon>mdi-clipboard-outline</v-icon>
+              </v-btn>
+              <v-btn
+                @click="openEditDialog(item.chipId)"
+                class="pa-0"
+                density="compact"
+                elevation="0"
+                variant="text"
+              >
+                {{ item.iccid }}
+              </v-btn>
+            </div>
           </template>
 
           <!-- Customização do campo de consumo total -->
@@ -133,6 +160,7 @@ import { useHumanReadableBytes } from "../../composable/useHumanReadableBytes";
 import { useDateUtils } from "../../composable/useDateUtils";
 import ConsumosTable from "../ConsumosTable.vue";
 import AdminChipFormPage from "../../views/Admin/Chip/Manage/Form.vue";
+import Swal from "sweetalert2";
 
 // Define o método emit para comunicar com o componente pai
 const emit = defineEmits(["update:selected"]);
@@ -253,6 +281,37 @@ const filteredItems = computed(() => {
 const openEditDialog = (chipId) => {
   selectedChipIdToEdit.value = chipId;
   editChipDialog.value = true;
+};
+
+const copiarTexto = (texto) => {
+  const textarea = document.createElement("textarea");
+  textarea.value = texto;
+
+  // evita que o textarea influencie no layout visual da página
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+
+  textarea.select();
+
+  try {
+    const sucesso = document.execCommand("copy");
+    Swal.fire({
+      icon: sucesso ? "success" : "error",
+      text: sucesso ? "Texto copiado!" : "Falha ao copiar!",
+      toast: true,
+      showConfirmButton: false,
+      position: "top-end",
+      timer: 3000,
+      timerProgressBar: true,
+    });
+  } catch (err) {
+    console.error("Erro ao copiar:", err);
+    alert("Erro ao copiar.");
+  } finally {
+    // Garante destruição mesmo se houver erro
+    document.body.removeChild(textarea);
+  }
 };
 </script>
 
