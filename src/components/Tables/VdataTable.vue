@@ -43,6 +43,7 @@
               <div
                 class="font-bold text-blue-800 dark:text-blue-400"
                 v-if="selectedItems.length"
+                @click="clearSelected"
               >
                 <span>{{ selectedItems.length }}</span>
                 Selecionados
@@ -247,6 +248,8 @@ const onSelectionChange = (newSelection) => {
 
 // Filtrar e ordenar os itens
 const filteredItems = computed(() => {
+  console.time("FILTRO"); // debug
+
   let filtered = [...props.items];
 
   filtered = filtered.filter((item) => {
@@ -274,6 +277,7 @@ const filteredItems = computed(() => {
       return sortDesc.value ? -result : result;
     });
   }
+  console.timeEnd("FILTRO"); // debug
 
   return filtered;
 });
@@ -312,6 +316,23 @@ const copiarTexto = (texto) => {
     // Garante destruição mesmo se houver erro
     document.body.removeChild(textarea);
   }
+};
+
+const clearSelected = () => {
+  Swal.fire({
+    icon: "warning",
+    text: "Isso vai DESSELECIONAR todas as linhas selecionadas",
+    showCancelButton: true,
+    reverseButtons: true,
+    confirmButtonText: "Desselecionar",
+    confirmButtonColor: "#F44336",
+    cancelButtonText: "Cancelar",
+    cancelButtonColor: "#BDBDBD",
+  }).then(({ isConfirmed }) => {
+    if (isConfirmed) {
+      selectedItems.value = [];
+    }
+  });
 };
 </script>
 
