@@ -45,6 +45,12 @@
           <template #item.consumo_total="{ item }">
             {{ formatarBytes(item.consumo_total) }}
           </template>
+          <template #item.created_at="{ item }">
+            {{ dateUtils.formatDate(item?.created_at || "", "dd/MM/yyyy") }}
+          </template>
+          <template #item.deleted_at="{ item }">
+            {{ dateUtils.formatDate(item?.deleted_at || "", "dd/MM/yyyy") }}
+          </template>
         </v-data-table>
       </v-card>
     </v-container>
@@ -53,6 +59,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useDateUtils } from "../../../composable/useDateUtils";
 import api from "../../../api";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import useTimer from "../../../composable/useTimer";
@@ -66,6 +73,7 @@ const carregando = ref(false);
 const formValido = ref(false);
 
 const { timer, start, pause, reset } = useTimer();
+const dateUtils = useDateUtils();
 
 const headers = [
   { title: "Telefone", key: "phone_number" },
