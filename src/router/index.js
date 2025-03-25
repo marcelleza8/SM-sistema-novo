@@ -146,6 +146,14 @@ const routes = [
               title: "Excesso de consumo",
             },
           },
+          {
+            path: "consumption",
+            name: "ReportConsumption",
+            component: () => import("../views/Admin/Reports/Consumption.vue"),
+            meta: {
+              title: "Excesso de consumo",
+            },
+          },
         ],
       },
     ],
