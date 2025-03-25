@@ -43,10 +43,10 @@
       <v-card class="mt-5" v-if="relatorio.length">
         <v-data-table :headers="headers" :items="relatorio" class="elevation-1">
           <!-- Customização do campo de consumo total -->
-          <template v-slot:item.consumoTotal="{ item }">
+          <template v-slot:item.consumo_total="{ item }">
             {{
-              item.consumoTotal
-                ? useHumanReadableBytes().formatBytes(item.consumoTotal, "MB")
+              item.consumo_total
+                ? useHumanReadableBytes().formatBytes(item.consumo_total, "MB")
                 : ""
             }}
           </template>
