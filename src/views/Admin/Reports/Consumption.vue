@@ -42,8 +42,13 @@
       </v-card>
       <v-card class="mt-5" v-if="relatorio.length">
         <v-data-table :headers="headers" :items="relatorio" class="elevation-1">
-          <template #item.consumo_total="{ item }">
-            {{ formatarBytes(item.consumo_total) }}
+          <!-- Customização do campo de consumo total -->
+          <template v-slot:item.consumoTotal="{ item }">
+            {{
+              item.consumoTotal
+                ? useHumanReadableBytes().formatBytes(item.consumoTotal, "MB")
+                : ""
+            }}
           </template>
           <template #item.created_at="{ item }">
             {{ dateUtils.formatDate(item?.created_at || "", "dd/MM/yyyy") }}
@@ -60,6 +65,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useDateUtils } from "../../../composable/useDateUtils";
+import { useHumanReadableBytes } from "../../../composable/useHumanReadableBytes";
 import api from "../../../api";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import useTimer from "../../../composable/useTimer";
