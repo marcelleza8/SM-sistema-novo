@@ -56,9 +56,66 @@
           <template #item.deleted_at="{ item }">
             {{ dateUtils.formatDate(item?.deleted_at || "", "dd/MM/yyyy") }}
           </template>
+
+          <template #[`item.phone_number`]="{ item }">
+            <div class="d-flex ga-2">
+              <v-btn
+                density="compact"
+                icon
+                @click="copiarTexto(item.phone_number)"
+              >
+                <v-icon>mdi-clipboard-outline</v-icon>
+              </v-btn>
+              <v-btn
+                @click="openEditDialog(item.chipId)"
+                elevation="0"
+                class="pa-0"
+                variant="text"
+              >
+                {{ item.phone_number }}
+              </v-btn>
+            </div>
+          </template>
+          <template #[`item.icc`]="{ item }">
+            <div class="d-flex ga-2">
+              <v-btn
+                class="pa-0"
+                density="compact"
+                icon
+                @click="copiarTexto(item.icc)"
+              >
+                <v-icon>mdi-clipboard-outline</v-icon>
+              </v-btn>
+              <v-btn
+                @click="openEditDialog(item.chipId)"
+                class="pa-0"
+                density="compact"
+                elevation="0"
+                variant="text"
+              >
+                {{ item.icc }}
+              </v-btn>
+            </div>
+          </template>
         </v-data-table>
       </v-card>
     </v-container>
+    <v-dialog v-model="editChipDialog" max-width="90%">
+      <v-card>
+        <v-card-title>Edição de Chip</v-card-title>
+        <v-card-text>
+          <AdminChipFormPage
+            :id="selectedChipIdToEdit"
+            showOnlyContent="true"
+            @close="
+              () => {
+                editChipDialog = false;
+              }
+            "
+          />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </DashboardLayout>
 </template>
 
@@ -68,6 +125,7 @@ import { useDateUtils } from "../../../composable/useDateUtils";
 import { useHumanReadableBytes } from "../../../composable/useHumanReadableBytes";
 import api from "../../../api";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
+import AdminChipFormPage from "../Chip/Manage/Form.vue";
 import useTimer from "../../../composable/useTimer";
 
 const contracts = ref([]);
@@ -77,6 +135,9 @@ const mesAno = ref("");
 const relatorio = ref<any[]>([]);
 const carregando = ref(false);
 const formValido = ref(false);
+
+const editChipDialog = ref(false);
+const selectedChipIdToEdit = ref(0);
 
 const { timer, start, pause, reset } = useTimer();
 const dateUtils = useDateUtils();
@@ -136,6 +197,11 @@ async function buscarRelatorio() {
     pause();
   }
 }
+
+const openEditDialog = (chipId: string) => {
+  selectedChipIdToEdit.value = chipId;
+  editChipDialog.value = true;
+};
 
 async function fetchContracts() {
   const contractResponse = await api.get("admin/contrato-chip/clientes-ativos");
