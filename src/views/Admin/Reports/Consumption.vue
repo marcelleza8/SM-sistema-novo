@@ -159,17 +159,6 @@ function validaMesAno(v: string) {
   return regex.test(v) || "Formato deve ser MM-YY";
 }
 
-function formatarBytes(bytes: number = null) {
-  if (!bytes) return null;
-  const units = ["B", "KB", "MB", "GB"];
-  let i = 0;
-  while (bytes >= 1024 && i < units.length - 1) {
-    bytes /= 1024;
-    i++;
-  }
-  return `${bytes.toFixed(1)} ${units[i]}`;
-}
-
 async function buscarRelatorio() {
   if (!selectedContract.value || !validaMesAno(mesAno.value) === true) return;
 
@@ -197,6 +186,37 @@ async function buscarRelatorio() {
     pause();
   }
 }
+
+const copiarTexto = (texto) => {
+  const textarea = document.createElement("textarea");
+  textarea.value = texto;
+
+  // evita que o textarea influencie no layout visual da página
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+
+  textarea.select();
+
+  try {
+    const sucesso = document.execCommand("copy");
+    Swal.fire({
+      icon: sucesso ? "success" : "error",
+      text: sucesso ? "Texto copiado!" : "Falha ao copiar!",
+      toast: true,
+      showConfirmButton: false,
+      position: "top-end",
+      timer: 3000,
+      timerProgressBar: true,
+    });
+  } catch (err) {
+    console.error("Erro ao copiar:", err);
+    alert("Erro ao copiar.");
+  } finally {
+    // Garante destruição mesmo se houver erro
+    document.body.removeChild(textarea);
+  }
+};
 
 const openEditDialog = (chipId: string) => {
   selectedChipIdToEdit.value = chipId;
