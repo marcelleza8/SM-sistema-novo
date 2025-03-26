@@ -124,6 +124,7 @@ import { ref, onMounted } from "vue";
 import { useDateUtils } from "../../../composable/useDateUtils";
 import { useHumanReadableBytes } from "../../../composable/useHumanReadableBytes";
 import api from "../../../api";
+import Swal from "sweetalert2";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import AdminChipFormPage from "../Chip/Manage/Form.vue";
 import useTimer from "../../../composable/useTimer";
@@ -187,7 +188,7 @@ async function buscarRelatorio() {
   }
 }
 
-const copiarTexto = (texto) => {
+const copiarTexto = (texto: string) => {
   const textarea = document.createElement("textarea");
   textarea.value = texto;
 
