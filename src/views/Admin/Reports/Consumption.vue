@@ -148,7 +148,7 @@ const headers = [
   { title: "ICC", key: "icc" },
   { title: "Status", key: "status" },
   { title: "Plano", key: "plan" },
-  { title: "Serial", key: "imei" },
+  { title: "Serial", key: "imei_aparelho" },
   { title: "Consumo Total", key: "consumo_total" },
   { title: "SMS", key: "consumo_sms_mensal" },
   { title: "Adicionado em", key: "created_at" },
