@@ -33,9 +33,17 @@
           <span :title="item.rerun">{{ item?.consumo_total_MB }}</span>
         </template>
         <template v-slot:item.created_at="{ item }">
-          <span :title="dateUtils.timeAgo(item?.created_at || '')">{{
-            dateUtils.formatDate(item?.created_at || "", "dd/MM/yyyy HH:mm:ss")
-          }}</span>
+          <span
+            :title="
+              dateUtils.formatDate(item?.updated_at, 'dd/MM/yyyy HH:mm:ss')
+            "
+            >{{
+              dateUtils.formatDate(
+                item?.created_at || "",
+                "dd/MM/yyyy HH:mm:ss"
+              )
+            }}</span
+          >
         </template>
         <template v-slot:item.ultimo_acesso="{ item }">
           <span :title="dateUtils.timeAgo(item?.ultimo_acesso || '')">{{
