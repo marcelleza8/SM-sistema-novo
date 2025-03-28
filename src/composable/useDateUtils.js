@@ -8,8 +8,8 @@ import { ptBR } from "date-fns/locale";
 
 export function useDateUtils() {
   // Função para formatar a data em um idioma específico
-  const formatDate = (dateString, formatString = "dd/MM/yyyy") => {
-    if (!dateString.length) {
+  const formatDate = (dateString = null, formatString = "dd/MM/yyyy") => {
+    if (!dateString?.length) {
       return "";
     }
 
