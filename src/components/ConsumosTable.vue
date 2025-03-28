@@ -29,6 +29,9 @@
             clearable
           ></v-text-field>
         </template>
+        <template v-slot:item.consumo_total_MB="{ item }">
+          <span :title="item.rerun">{{ item?.consumo_total_MB }}</span>
+        </template>
         <template v-slot:item.created_at="{ item }">
           <span :title="dateUtils.timeAgo(item?.created_at || '')">{{
             dateUtils.formatDate(item?.created_at || "", "dd/MM/yyyy HH:mm:ss")
