@@ -23,6 +23,27 @@ const vuetify = createVuetify({
     VDateInput,
   },
   directives,
+  theme: {
+    defaultTheme: "light", // Padrão claro
+    themes: {
+      light: {
+        colors: {
+          background: "#FFFFFF",
+          surface: "#FFFFFF",
+          primary: "#ce4b6c",
+          secondary: "#bc2841",
+        },
+      },
+      dark: {
+        colors: {
+          background: "#121212",
+          surface: "#121212",
+          primary: "#BB86FC",
+          secondary: "#03DAC6",
+        },
+      },
+    },
+  },
   locale: {
     locale: "pt",
     messages: { pt },
