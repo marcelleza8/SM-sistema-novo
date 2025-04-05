@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@novnc/novnc": "^1.5.0",
     "axios": "^1.6.2",
     "date-fns": "^4.1.0",
     "lodash": "^4.17.21",
     "pinia": "^2.1.7",
     "sweetalert2": "^11.10.1",
     "vue": "^3.3.8",
+    "vue-currency-input": "^3.0.3",
     "vue-router": "4"
   },
   "devDependencies": {
