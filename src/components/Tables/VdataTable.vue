@@ -138,7 +138,7 @@
     </v-row>
     <v-dialog v-model="editChipDialog" max-width="90%">
       <v-card>
-        <v-card-title>Edição de Chip</v-card-title>
+        <v-card-title>Edição de Chip #{{ selectedChipIdToEdit }}</v-card-title>
         <v-card-text>
           <AdminChipFormPage
             :id="selectedChipIdToEdit"
