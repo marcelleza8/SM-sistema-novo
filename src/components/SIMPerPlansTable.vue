@@ -46,7 +46,7 @@
                 (detail.consumoTotalByte -
                   detail.planoTotalByte * detail.qtdSIMCard) /
                   1024 ** 2
-              ).toFixed(2)
+              ).toFixed(3)
             }}
           </td>
         </tr>
