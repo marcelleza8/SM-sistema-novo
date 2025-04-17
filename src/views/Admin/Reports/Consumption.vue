@@ -40,7 +40,10 @@
         </v-form>
         <h1>{{ timer }}</h1>
       </v-card>
-      <v-card class="mt-5" v-if="relatorio.length">
+      <v-card class="mt-5" v-if="relatorio?.length">
+        <div class="grid place-items-center my-4">
+          <SIMPerPlanTable :SIMDetails="SIMDetails" />
+        </div>
         <v-data-table :headers="headers" :items="relatorio" class="elevation-1">
           <!-- Customização do campo de consumo total -->
           <template v-slot:item.consumo_total="{ item }">
@@ -128,8 +131,11 @@ import Swal from "sweetalert2";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import AdminChipFormPage from "../Chip/Manage/Form.vue";
 import useTimer from "../../../composable/useTimer";
+import SIMPerPlanTable from "../../../components/SIMPerPlansTable.vue";
 
 const contracts = ref([]);
+
+const SIMDetails = ref([]);
 
 const selectedContract = ref<number | null>(null);
 const mesAno = ref("");
@@ -178,7 +184,9 @@ async function buscarRelatorio() {
       mes_ano: formatoAPI,
     });
 
-    relatorio.value = response.data;
+    relatorio.value = response.data[1];
+    SIMDetails.value = response.data[0];
+    // console.log(response.data[0]);
   } catch (err) {
     console.error("Erro ao buscar relatório:", err);
     relatorio.value = [];
