@@ -43,7 +43,7 @@
           </div>
         </div>
       </div>
-      <div>importação</div>
+      <SIMmanualInport />
     </div>
     <div v-else>
       <div class="result-control">
@@ -128,6 +128,7 @@ import VdataTable from "../../../components/Tables/VdataTable.vue";
 import ChipChangeStatus from "../../../components/ChipChangeStatus.vue";
 import ChipChangePlan from "../../../components/ChipChangePlan.vue";
 import { useHumanReadableBytes } from "../../../composable/useHumanReadableBytes";
+import SIMmanualInport from "../../../components/SIMmanualInport.vue";
 const verify = ref({
   client: null,
 });
