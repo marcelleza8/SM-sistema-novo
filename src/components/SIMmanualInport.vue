@@ -64,7 +64,7 @@ const uploading = ref(false);
 const uploadMessage = ref("");
 const uploadSuccess = ref(false);
 
-const loadOptions = async () => {
+const loadOperadoraOptions = async () => {
   loadingOptions.value = true;
   try {
     const response = await api.get("admin/operadoras");
@@ -89,7 +89,10 @@ const uploadFile = async () => {
     formData.append("file", file.value);
     formData.append("operadora", selectedOperadoraOption.value);
 
-    const response = await api.post("/upload-endpoint", formData);
+    const response = await api.post(
+      `${import.meta.env.VITE_API_FLASK_URL}rpa-vivo`,
+      formData
+    );
 
     uploadSuccess.value = true;
     uploadMessage.value = "Arquivo enviado com sucesso!";
@@ -104,6 +107,6 @@ const uploadFile = async () => {
 };
 
 onMounted(() => {
-  loadOptions();
+  loadOperadoraOptions();
 });
 </script>
