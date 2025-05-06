@@ -49,12 +49,16 @@
         </v-alert>
       </v-col>
     </v-row>
+    <v-row>
+      <LabelWrapper />
+    </v-row>
   </v-container>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import api from "../api";
+import LabelWrapper from "./LabelWrapper.vue";
 
 const selectedOperadoraOption = ref(null);
 const operadoraOptions = ref([]);
@@ -103,6 +107,11 @@ const uploadFile = async () => {
     console.error("Erro no upload:", error);
   } finally {
     uploading.value = false;
+    file.value = null;
+    selectedOperadoraOption.value = null;
+    setTimeout(() => {
+      uploadMessage.value = false;
+    }, 4000);
   }
 };
 

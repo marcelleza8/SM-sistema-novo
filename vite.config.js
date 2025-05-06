@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import { fileURLToPath, URL } from "node:url";
 
 import packageJson from "./package.json";
 
@@ -9,6 +10,10 @@ export default defineConfig({
   define: {
     "process.env": {
       VUE_APP_VERSION: packageJson.version,
+    },
+
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
 });

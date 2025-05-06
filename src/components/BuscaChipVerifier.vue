@@ -6,7 +6,7 @@
     </p>
     <textarea
       ref="textareaRef"
-      class="disabled:bg-gray-400 disabled:text-white"
+      class="disabled:bg-gray-400 disabled:text-white border"
       :disabled="verifying"
       v-model="toSearch"
       cols="25"

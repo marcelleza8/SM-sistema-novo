@@ -25,7 +25,7 @@
             v-model="verify.client"
             url="admin/clientes/buscar"
           />
-          <div class="mt-16 text-center grid grid-cols-2">
+          <div class="mt-4 text-center grid grid-cols-2">
             <BuscaChipverifier
               :disabled="searching"
               v-model="verify.items"
