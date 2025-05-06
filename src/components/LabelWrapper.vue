@@ -5,11 +5,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import LabelTag from "./LabelTag.vue";
 import api from "../api";
 
 const tags = ref([]);
+const timerId = ref(0);
 const loadTags = async () => {
   const response = await api.get(
     `${import.meta.env.VITE_API_FLASK_URL}upload-progress`
@@ -21,9 +22,13 @@ const loadTags = async () => {
 };
 
 onMounted(() => {
-  setInterval(() => {
+  timerId.value = setInterval(() => {
     loadTags();
   }, 1000);
+});
+
+onUnmounted(() => {
+  clearInterval(timerId.value);
 });
 </script>
 <style scoped>
