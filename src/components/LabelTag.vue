@@ -1,18 +1,8 @@
 <template>
-  <v-card
-    @click="openDelete"
-    outlined
-    :class="[statusClass, 'pa-4', 'mb-4']"
-    shaped
-  >
-    <v-card-title class="text-h6">{{ tag.title }}</v-card-title>
+  <v-sheet @click="openDelete" outlined :class="[statusClass, 'pa-1']" shaped>
+    <v-card-title class="text-h6 pa-0 pl-4">{{ tag.title }}</v-card-title>
     <v-card-text>
-      <div class="mb-2">{{ tag.description }}</div>
-      <v-progress-linear
-        :value="tag.progress"
-        height="8"
-        class="mb-2"
-      ></v-progress-linear>
+      <div class="mb-2 pl-2">{{ tag.description }}desch</div>
       <div class="flex justify-between">
         <span class="text-subtitle mb-1">Progresso: {{ tag.progress }}%</span>
         <span v-if="tag.finished_at" class="text-subtitle">
@@ -28,7 +18,7 @@
         </span>
       </div>
     </v-card-text>
-  </v-card>
+  </v-sheet>
 
   <!-- Dialog de confirmação -->
   <v-dialog v-model="confirmDialog" max-width="400">
@@ -72,9 +62,9 @@ const props = defineProps({
 
 const statusClass = computed(() => {
   if (props.tag?.finished_at) {
-    return "border-success";
+    return "border-success border-md";
   } else {
-    return "border-warning";
+    return "border-warning border-md";
   }
 });
 
