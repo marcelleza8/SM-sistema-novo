@@ -85,6 +85,31 @@ const routes = [
         ],
       },
       {
+        path: "contract",
+        meta: {
+          title: "Contract Management - Admin",
+        },
+        children: [
+          {
+            path: "",
+            name: "AdminContractListPage",
+            component: () => import("../views/Admin/Contracts/List.vue"),
+            meta: {
+              title: "Lista de Contratos - Admin",
+            },
+          },
+          {
+            path: "edit/:id",
+            name: "AdminContractEditPage",
+            component: () => import("../views/Admin/Contracts/Edit.vue"),
+            props: true,
+            meta: {
+              title: "Editar Contrato - Admin",
+            },
+          },
+        ],
+      },
+      {
         path: "operadoras",
         meta: {
           title: "Operadoras - Admin",

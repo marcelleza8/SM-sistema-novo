@@ -43,6 +43,12 @@
         :to="{ name: 'ReportConsumption' }"
         >Relatório consumo</RouterLink
       >
+      <router-link
+        class="px-8 py-7 bg-pink-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-30 border border-gray-100"
+        :to="{ name: 'AdminContractListPage' }"
+      >
+        Ver Contratos
+      </router-link>
     </div>
   </DashboardLayout>
 </template>

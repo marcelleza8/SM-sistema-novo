@@ -9,3 +9,9 @@ button.primary {
 body.swal2-toast-shown .swal2-container {
   width: auto !important;
 }
+
+/* Remove outline de todos os elementos focados */
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
