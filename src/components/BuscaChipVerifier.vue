@@ -7,6 +7,10 @@
     <textarea
       ref="textareaRef"
       class="disabled:bg-gray-400 disabled:text-white border"
+      :class="{
+        'bg-green-100': formattedLength > 0 && unFormattedLength === 0,
+        'bg-red-100': unFormattedLength > 0,
+      }"
       :disabled="verifying"
       v-model="toSearch"
       cols="25"
@@ -33,6 +37,8 @@ const { valid: validPhone } = usePhoneNumbe();
 
 const textareaRef = ref(null);
 const toSearch = ref(null);
+const formattedLength = ref(0);
+const unFormattedLength = ref(0);
 const verifying = ref(false);
 
 const totalRows = computed(
@@ -68,11 +74,12 @@ function validade() {
     }
   }
 
+  formattedLength.value = formatted.length;
+  unFormattedLength.value = unFormatted.length;
+
   emits("update:modelValue", {
     formatted,
     unFormatted,
   });
 }
 </script>
-
-<style scoped></style>
