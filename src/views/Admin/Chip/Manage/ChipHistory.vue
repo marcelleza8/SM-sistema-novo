@@ -4,9 +4,11 @@
     <v-card-text>
       <v-list>
         <v-list-item v-for="(log, index) in logs" :key="index">
-          <v-list-item-content>
-            {{ formatDate(log.created_at) }} - {{ log.description }}
-          </v-list-item-content>
+          <v-list-item-title>
+            <span class="text-sm">{{ formatDate(log.created_at) }}</span>
+            -
+            <span>{{ log.description }}</span>
+          </v-list-item-title>
         </v-list-item>
       </v-list>
     </v-card-text>

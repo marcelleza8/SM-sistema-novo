@@ -32,17 +32,20 @@
           :class="$vuetify.display.smAndDown ? 'flex-column' : 'flex-row'"
         >
           <router-link
-            :to="{ name: 'AdminContractListPage' }"
+            :to="{
+              name: 'AdminContractEditPage',
+              params: { id: item.id, tabId: 'anexos' },
+            }"
             class="tag-button"
           >
-            Ver
+            Incluir anexo
           </router-link>
 
           <router-link
             :to="{ name: 'AdminContractEditPage', params: { id: item.id } }"
             class="tag-button"
           >
-            Editar
+            Editar contrato
           </router-link>
 
           <router-link

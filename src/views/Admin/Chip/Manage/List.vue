@@ -1,7 +1,7 @@
 <template>
   <DashboardLayout>
     <div class="flex justify-between my-4 mb-6 mr-4">
-      <h1 class="text-3xl">Lista de Chip</h1>
+      <h1 class="text-3xl">Lista de Chips</h1>
       <RouterLink
         :to="{ name: 'AdminChipAddFormPage' }"
         class="bg-green-200 px-4 py-1 rounded-md font-bold"
@@ -9,48 +9,97 @@
         Adicionar
       </RouterLink>
     </div>
-    <DataTable :items="items">
-      <template v-slot:item.linha="{ item }"> {{ item.linha }}! </template>
-    </DataTable>
-    <Pagination
-      class="mt-4"
-      :currentPage="currentPage"
-      :totalPages="totalPages"
-      @update:currentPage="fetchData"
+
+    <p>
+      <span>Total: {{ pagination.total }}</span>
+    </p>
+
+    <DataTable
+      :items="items"
+      :pagination="pagination"
+      :loading="loading"
+      @update:search="onFiltro"
+      @update:page="onPageChange"
+      @update:items-per-page="onItemsPerPageChange"
     />
   </DashboardLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { ref, reactive, onMounted, emit } from "vue";
 import DashboardLayout from "../../../../layouts/DashboardLayout.vue";
 import DataTable from "../../../../components/Tables/DataTable.vue";
-import Pagination from "../../../../components/Paginations/Pagination.vue";
 import api from "../../../../api";
-import { onMounted, ref } from "vue";
 
 const items = ref([]);
-const currentPage = ref(1);
-const totalPages = ref(0);
+const loading = ref(false);
+const search = ref("");
 
-async function fetchData(page = 1) {
-  const response = await api.get(`admin/chip/?page=${page}`);
-  console.log(response.data);
-  items.value = response.data.data;
-  currentPage.value = response.data.meta.current_page;
-  totalPages.value = response.data.meta.last_page;
+const emit = defineEmits([
+  "update:search",
+  "update:page",
+  "update:items-per-page",
+]);
+
+const pagination = reactive({
+  page: 1,
+  itemsPerPage: 10,
+  total: 0,
+});
+
+const filtros = reactive({
+  search: "",
+  status: null,
+  cliente: null,
+  conta: null,
+});
+
+async function fetchData() {
+  loading.value = true;
+  try {
+    const response = await api.get("/admin/chip", {
+      params: {
+        page: pagination.page,
+        per_page: pagination.itemsPerPage,
+        search: filtros.search,
+        status: filtros.status,
+        cliente: filtros.cliente,
+        conta: filtros.conta,
+      },
+    });
+
+    items.value = response.data.data;
+    pagination.total = response.data.meta.total;
+  } finally {
+    loading.value = false;
+  }
 }
 
-onMounted(() => fetchData());
+function onSearch(val: string) {
+  search.value = val;
+  pagination.page = 1;
+  fetchData();
+}
+
+function onPageChange(val: number) {
+  pagination.page = val;
+  fetchData();
+}
+
+function onFiltro(payload: any) {
+  filtros.search = payload.search;
+  filtros.status = payload.status;
+  filtros.cliente = payload.cliente;
+  filtros.conta = payload.conta;
+  pagination.page = 1;
+  fetchData();
+}
+
+function onItemsPerPageChange(val: number) {
+  pagination.itemsPerPage = val;
+  pagination.page = 1;
+  fetchData();
+}
+
+onMounted(fetchData);
 </script>
-
-<style scoped>
-table {
-  @apply w-full border;
-}
-
-table tr,
-table tr th,
-table tr td {
-  @apply border;
-}
-</style>

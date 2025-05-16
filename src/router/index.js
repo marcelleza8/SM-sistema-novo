@@ -99,7 +99,7 @@ const routes = [
             },
           },
           {
-            path: "edit/:id",
+            path: "edit/:id/:tabId?",
             name: "AdminContractEditPage",
             component: () => import("../views/Admin/Contracts/Edit.vue"),
             props: true,

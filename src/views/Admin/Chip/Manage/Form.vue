@@ -84,7 +84,7 @@ const router = useRouter();
 
 const props = defineProps({
   id: {
-    type: Number,
+    type: String,
     default: null,
   },
   showOnlyContent: {
@@ -157,7 +157,7 @@ onMounted(async () => {
       form.account_id = data.account_id;
       form.chip_plan_id = data.chip_plan_id;
       form.status_id = data.status_id;
-      chipLogs.value = data.logs;
+      chipLogs.value = data.logs.reverse();
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
     }
