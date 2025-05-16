@@ -42,13 +42,13 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      :items-per-page="pagination.itemsPerPage"
       :page="pagination.page"
+      @update:page="$emit('update:page', $event)"
+      :items-per-page="pagination.itemsPerPage"
       :server-items-length="pagination.total"
+      @update:items-per-page="$emit('update:items-per-page', $event)"
       :loading="loading"
       class="elevation-1"
-      @update:page="$emit('update:page', $event)"
-      @update:items-per-page="$emit('update:items-per-page', $event)"
     >
       <template #item.actions="{ item }">
         <div class="d-flex justify-end ga-2">
@@ -87,6 +87,10 @@ const emit = defineEmits([
 const search = ref("");
 
 const statusOptions = ref([
+  {
+    id: null,
+    title: "Todos",
+  },
   {
     id: 4,
     title: "Disponível",
@@ -135,8 +139,6 @@ function emitFiltro() {
     conta: selectedConta.value,
   };
 
-  console.log(payload);
-
   emit("update:search", payload);
 }
 
@@ -153,7 +155,7 @@ onMounted(async () => {
     title: i.name,
     id: i.id,
   }));
-  contaOptions.value = [{ title: "Nenhum", id: null }, ...contaOptions.value];
+  contaOptions.value = [{ title: "Todos", id: null }, ...contaOptions.value];
 
   const resCliente = await api.get("admin/clientes");
   clienteOptions.value = resCliente.data.map((i: any) => ({
@@ -161,7 +163,7 @@ onMounted(async () => {
     id: i.id,
   }));
   clienteOptions.value = [
-    { title: "Nenhum", id: null },
+    { title: "Todos", id: null },
     ...clienteOptions.value,
   ];
 });

@@ -19,8 +19,13 @@
       :pagination="pagination"
       :loading="loading"
       @update:search="onFiltro"
-      @update:page="onPageChange"
       @update:items-per-page="onItemsPerPageChange"
+    />
+    <AdvancedPaginator
+      v-if="false"
+      :page="pagination.page"
+      :total-pages="Math.ceil(pagination.total / pagination.itemsPerPage)"
+      @update:page="onPageChange"
     />
   </DashboardLayout>
 </template>
@@ -30,6 +35,7 @@ import { ref, reactive, onMounted, emit } from "vue";
 import DashboardLayout from "../../../../layouts/DashboardLayout.vue";
 import DataTable from "../../../../components/Tables/DataTable.vue";
 import api from "../../../../api";
+import AdvancedPaginator from "../../../../components/Paginations/AdvancedPaginator.vue";
 
 const items = ref([]);
 const loading = ref(false);
@@ -69,19 +75,15 @@ async function fetchData() {
     });
 
     items.value = response.data.data;
+
     pagination.total = response.data.meta.total;
   } finally {
     loading.value = false;
   }
 }
 
-function onSearch(val: string) {
-  search.value = val;
-  pagination.page = 1;
-  fetchData();
-}
-
 function onPageChange(val: number) {
+  //
   pagination.page = val;
   fetchData();
 }
