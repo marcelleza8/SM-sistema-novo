@@ -204,7 +204,7 @@ const search = async () => {
   controller = new AbortController();
 
   try {
-    const res = await api.post(
+    /* const res = await api.post(
       "admin/chip/buscar",
       {
         ...verify.value,
@@ -212,10 +212,19 @@ const search = async () => {
       {
         signal: controller.signal,
       }
+    ); */
+    // downLink.value = res.data.downLink;
+    const response = await api.get(
+      `http://192.168.1.34:8001/api/v2/client/${verify.value.client}/simcards`
     );
-    downLink.value = res.data.downLink;
-    searchResult.value = res.data.result;
+
+    if (response) {
+      searchResult.value = response.data.chips;
+      // tags.value = response.data.tags;
+    }
   } catch (error) {
+    console.log(error);
+
     Swal.fire({
       toast: true,
       icon: "info",

@@ -63,40 +63,18 @@
             ></v-text-field>
           </template>
 
-          <template #[`item.linha`]="{ item }">
+          <template #[`item.phone_number`]="{ item }">
             <div class="d-flex ga-2">
-              <v-btn density="compact" icon @click="copiarTexto(item.linha)">
-                <v-icon>mdi-clipboard-outline</v-icon>
-              </v-btn>
-              <v-btn
-                @click="openEditDialog(item.chipId)"
-                elevation="0"
-                class="pa-0"
-                variant="text"
-              >
-                {{ item.linha }}
-              </v-btn>
+              <span @click="openEditDialog(item.chip_id)">
+                {{ item.phone_number }}
+              </span>
             </div>
           </template>
-          <template #[`item.iccid`]="{ item }">
+          <template #[`item.imei`]="{ item }">
             <div class="d-flex ga-2">
-              <v-btn
-                class="pa-0"
-                density="compact"
-                icon
-                @click="copiarTexto(item.iccid)"
-              >
-                <v-icon>mdi-clipboard-outline</v-icon>
-              </v-btn>
-              <v-btn
-                @click="openEditDialog(item.chipId)"
-                class="pa-0"
-                density="compact"
-                elevation="0"
-                variant="text"
-              >
-                {{ item.iccid }}
-              </v-btn>
+              <span @click="openEditDialog(item.chip_id)" class="pa-0">
+                {{ item.imei }}
+              </span>
             </div>
           </template>
 
@@ -172,17 +150,17 @@ const props = defineProps({
 
 const headers = ref([
   { title: "", value: "data-table-expand", width: "1%" }, // Coluna para expandir
-  { title: "Cliente", value: "cliente", sortable: true, nowrap: true },
-  { title: "Linha", value: "linha", sortable: true, nowrap: true },
-  { title: "ICCID", value: "iccid", sortable: true, nowrap: true },
-  { title: "Status", value: "status", sortable: true, nowrap: true },
+  { title: "Cliente", value: "clients_name", sortable: true, nowrap: true },
+  { title: "Linha", value: "phone_number", sortable: true, nowrap: true },
+  { title: "ICCID", value: "imei", sortable: true, nowrap: true },
+  { title: "Status", value: "status_name", sortable: true, nowrap: true },
   {
     title: "Plano",
-    value: "plano",
+    value: "plan_name",
     sortable: true,
     nowrap: true,
   },
-  { title: "Operadora", value: "operadora", sortable: true, nowrap: true },
+  { title: "Operadora", value: "operators_name", sortable: true, nowrap: true },
   {
     title: "Último Acesso",
     value: "ultimoAcesso",
@@ -235,10 +213,10 @@ const selectedPlano = ref([]);
 
 // Valores únicos para cada filtro (para exibir nos selects)
 const uniqueOperadoras = computed(() =>
-  Array.from(new Set([...props.items].map((item) => item.operadora)))
+  Array.from(new Set([...props.items].map((item) => item.operators_name)))
 );
 const uniquePlanos = computed(() =>
-  Array.from(new Set([...props.items].map((item) => item.plano)))
+  Array.from(new Set([...props.items].map((item) => item.plan_name)))
 );
 
 // Atualiza a lista de selecionados e emite o evento para o pai
@@ -255,9 +233,9 @@ const filteredItems = computed(() => {
   filtered = filtered.filter((item) => {
     return (
       (selectedOperadora.value.length === 0 ||
-        selectedOperadora.value.includes(item.operadora)) &&
+        selectedOperadora.value.includes(item.operators_name)) &&
       (selectedPlano.value.length === 0 ||
-        selectedPlano.value.includes(item.plano))
+        selectedPlano.value.includes(item.plan_name))
     );
   });
 
