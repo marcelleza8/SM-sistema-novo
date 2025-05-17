@@ -1,6 +1,9 @@
 <template>
   <v-card>
-    <v-card-title>Histórico do Chip</v-card-title>
+    <v-card-title
+      >Histórico do Chip
+      <strong class="text-sm">(order decrescente)</strong></v-card-title
+    >
     <v-card-text>
       <v-list>
         <v-list-item v-for="(log, index) in logs" :key="index">
