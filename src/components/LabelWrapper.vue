@@ -10,7 +10,7 @@ import LabelTag from "./LabelTag.vue";
 import api from "../api";
 
 const tags = ref([]);
-const timerId = ref(0);
+const timerId = ref(0); //
 const loadTags = async () => {
   const response = await api.get(
     `${import.meta.env.VITE_API_FLASK_URL}upload-progress`
