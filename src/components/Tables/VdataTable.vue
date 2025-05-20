@@ -79,20 +79,23 @@
           </template>
 
           <!-- Customização do campo de consumo total -->
-          <template v-slot:item.consumoTotal="{ item }">
+          <template v-slot:item.consumo_total="{ item }">
             {{
-              item.consumoTotal
-                ? useHumanReadableBytes().formatBytes(item.consumoTotal, "MB")
+              item.consumo_total
+                ? useHumanReadableBytes().formatBytes(item.consumo_total, "MB")
                 : ""
             }}
           </template>
 
           <!-- Customização do campo de último acesso -->
-          <template v-slot:item.ultimoAcesso="{ item }">
-            <span :title="dateUtils.timeAgo(item?.ultimoAcesso || '')">{{
-              dateUtils.formatDate(item?.ultimoAcesso || "", "dd/MM/yyyy HH:mm")
+          <template v-slot:item.ultimo_acesso="{ item }">
+            <span :title="dateUtils.timeAgo(item?.ultimo_acesso || '')">{{
+              dateUtils.formatDate(
+                item?.ultimo_acesso || "",
+                "dd/MM/yyyy HH:mm"
+              )
             }}</span>
-            <!-- <span>{{ item.ultimoAcesso }}</span> -->
+            <!-- <span>{{ item.ultimo_acesso }}</span> -->
           </template>
 
           <!-- Customização do campo de conexao -->
@@ -163,26 +166,26 @@ const headers = ref([
   { title: "Operadora", value: "operators_name", sortable: true, nowrap: true },
   {
     title: "Último Acesso",
-    value: "ultimoAcesso",
+    value: "ultimo_acesso",
     sortable: true,
     nowrap: true,
   },
   { title: "Conexão", value: "conexao", sortable: true, nowrap: true },
   {
     title: "Consumo Total",
-    value: "consumoTotal",
+    value: "consumo_total",
     sortable: true,
     nowrap: true,
   },
   {
     title: "SMS",
-    value: "consumoSMS",
+    value: "consumo_sms_mensal",
     sortable: true,
     nowrap: true,
   },
   {
     title: "IMEI Dispositivo",
-    value: "imeiAparelho",
+    value: "imei_aparelho",
     sortable: true,
     nowrap: true,
   },
@@ -191,7 +194,7 @@ const headers = ref([
   { title: "APN", value: "apn", sortable: true, nowrap: true },
   {
     title: "Status na operadora",
-    value: "statusOperadora",
+    value: "status_operadora",
     sortable: true,
     nowrap: true,
   },

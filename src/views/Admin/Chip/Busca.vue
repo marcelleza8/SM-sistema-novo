@@ -219,7 +219,7 @@ const search = async () => {
     );
 
     if (response) {
-      searchResult.value = response.data.chips;
+      searchResult.value = response.data.details;
       // tags.value = response.data.tags;
     }
   } catch (error) {
