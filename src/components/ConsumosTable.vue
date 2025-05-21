@@ -105,7 +105,7 @@ const fetchConsumption = async () => {
   loadingData.value = true;
   try {
     const response = await api.get(
-      "admin/chip/consumption/" + props.item.chipId
+      "admin/chip/consumption/" + props.item.chip_id
     );
     consumptionItems.value = response.data;
   } catch (err) {}

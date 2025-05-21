@@ -191,6 +191,7 @@ const headers = ref([
 ]);
 
 const search = async () => {
+  const VITE_API_DENO_URL = import.meta.env.VITE_API_DENO_URL;
   searching.value = true;
   searchResult.value = [];
   filters.value = {};
@@ -214,9 +215,16 @@ const search = async () => {
       }
     ); */
     // downLink.value = res.data.downLink;
-    const response = await api.get(
-      `http://192.168.1.34:8001/api/v2/client/${verify.value.client}/simcards`
-    );
+    let deno_url = `${VITE_API_DENO_URL}/v2/client/sims`;
+    let response;
+    if (verify.value?.client) {
+      deno_url = `${VITE_API_DENO_URL}/v2/client/${verify.value.client}/simcards`;
+      response = await api.get(deno_url);
+    } else {
+      response = await api.post(deno_url, {
+        values: verify.value.items.formatted,
+      });
+    }
 
     if (response) {
       searchResult.value = response.data.details;
