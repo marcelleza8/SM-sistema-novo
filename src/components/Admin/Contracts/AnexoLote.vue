@@ -73,19 +73,7 @@
         />
       </v-col>
       <v-col cols="12" md="6">
-        <div id="output-lines">
-          <span v-if="outputWarnings.length === 0">Nenhum alerta ainda.</span>
-          <div v-for="(grupo, idx) in outputWarnings" :key="idx">
-            <h4>{{ grupo.titulo }}</h4>
-            <div
-              class="text-caption grid grid-cols-2"
-              v-for="item in grupo.itens"
-            >
-              <span> {{ item[0].linha }}</span>
-              <span>{{ item[0].status }}</span>
-            </div>
-          </div>
-        </div>
+        <OutputLines :resultado="outputWarnings" />
       </v-col>
     </v-row>
 
@@ -108,6 +96,7 @@ import { ref } from "vue";
 import api from "../../../api";
 import Swal from "sweetalert2";
 import LineInputField from "../../BuscaChipVerifier.vue";
+import OutputLines from "./outputLines.vue";
 
 const props = defineProps<{
   contract: {
@@ -116,7 +105,6 @@ const props = defineProps<{
   };
 }>();
 
-const modoValidacao = ref<"misto">("misto");
 const validando = ref(false);
 const salvando = ref(false);
 const outputWarnings = ref<{ titulo: string; itens: string[] }[]>([]);
@@ -144,20 +132,31 @@ const inputState = ref({
 
 async function validarLote() {
   if (!inputState.value.formatted.length) return;
+  const VITE_API_DENO_URL = import.meta.env.VITE_API_DENO_URL;
   validando.value = true;
   try {
-    const response = await api.post("/admin/chip/busca", {
-      type: "misto",
-      data: inputState.value.formatted,
-      contratoId: props.contract.id,
+    let deno_url = `${VITE_API_DENO_URL}/v2/client/sims`;
+    const response = await api.post(deno_url, {
+      values: inputState.value.formatted,
     });
 
-    outputWarnings.value = [
-      { titulo: "Já inseridas no contrato", itens: response.data.antigo || [] },
-      { titulo: "Em outro contrato", itens: response.data.encontrado || [] },
-      { titulo: "Canceladas", itens: response.data.cancelado || [] },
-      { titulo: "Não encontradas", itens: response.data.nEncontrado || [] },
-    ].filter((g) => g.itens.length);
+    const result = response.data.details;
+
+    outputWarnings.value = inputState.value.formatted.reduce(
+      (acc, val) => {
+        // Procura pelo valor em IMEI ou phone_number
+        const encontrado = result.find(
+          (d: any) => d.imei === val || d.phone_number == val.substring(2)
+        );
+        if (encontrado) {
+          acc.encontrados.push({ buscado: val, encontrado });
+        } else {
+          acc.naoEncontrados.push(val);
+        }
+        return acc;
+      },
+      { encontrados: [], naoEncontrados: [] }
+    );
   } catch (err) {
     console.error(err);
     Swal.fire("Erro", "Falha ao validar lote.", "error");

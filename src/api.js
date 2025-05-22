@@ -53,7 +53,7 @@ api.interceptors.response.use(
       authStore.clear();
     }
 
-    console.log("Erro na requisição", error.response.status);
+    console.log("Erro na requisição", error);
     return false;
     // return Promise.reject(error); // Lida com outros erros
   }
