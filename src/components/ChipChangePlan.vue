@@ -27,7 +27,7 @@
       @update:model-value="onCloseDialog"
       max-width="900"
     >
-      <v-card :title="`Alterar plano das linhas para ${newPlan?.title}`">
+      <v-card :title="`Alterar plano das linhas para ${newPlan?.name}`">
         <v-card-text>
           <h1>{{ items.length }} Selecionados</h1>
           <v-container>
@@ -173,14 +173,31 @@ const handleChangePlan = async () => {
   let data = {};
 
   data["data"] = props.items.map((i) => ({
-    chipId: i.chipId,
+    chipId: i.chip_id,
   }));
 
   data["plano"] = planToChange.value;
   data["anexPrice"] = anexPrice.value;
   data["anexDateInsert"] = anexDateInsert.value;
+  data["exportToCsv"] = exportToCsv.value ? exportToCsv.value : undefined;
 
   const res = await api.post("admin/chip/mudar-plano", data);
+
+  if (res.data?.csv) {
+    const blob = new Blob([res.data.csv], { type: "text/csv;charset=utf-8;" });
+
+    const fileName = `alterado_plano_SIM_${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   emit("changed", res.data);
   changeStatusDialog.value = false;
 };
