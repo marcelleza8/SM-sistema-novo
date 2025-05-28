@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <LabelTag v-for="(tag, redisKey) in tags" :redisKey="redisKey" :tag="tag" />
+    <LabelTag v-for="(tag, redisKey) in tags" :redisKey="tag.key" :tag="tag" />
   </div>
 </template>
 
