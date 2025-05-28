@@ -47,15 +47,13 @@ import { keys, pickBy } from "lodash";
 defineEmits(["exportSelected"]);
 
 const options = ref([
-  { id: "formato-kite", name: "Formato Kite" },
-  { id: "agrupar-20-por-linha", name: "Agrupar 20 por linha" },
-  { id: "add-cabecalho", name: "Add cabeçalho" },
-  { id: "iccid", name: "ICCID" },
-  { id: "linha", name: "Linha" },
-  { id: "status", name: "Status" },
-  { id: "data-status", name: "Data do status" },
-  { id: "cliente", name: "Cliente" },
-  { id: "conta", name: "Conta" },
+  { id: "imei", name: "ICCID" },
+  { id: "phone_number", name: "Linha" },
+  { id: "status_name", name: "Status" },
+  // { id: "data-status", name: "Data do status" },
+  { id: "clients_name", name: "Cliente" },
+  { id: "account_code", name: "Conta" },
+  { id: "plan_name", name: "Plano" },
 ]);
 
 const selectedOptions = ref({});
