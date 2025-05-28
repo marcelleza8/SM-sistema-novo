@@ -92,7 +92,9 @@ function onConfirm() {
 // exemplo de ação: exibe toast de sucesso
 async function deleteItem() {
   const response = await axios.delete(
-    `${import.meta.env.VITE_API_FLASK_URL}upload-progress/${props.redisKey}`
+    `${import.meta.env.VITE_API_FLASK_URL}/upload/upload-progress/${
+      props.redisKey
+    }`
   );
 
   showToast("Item deletado com sucesso", "success");

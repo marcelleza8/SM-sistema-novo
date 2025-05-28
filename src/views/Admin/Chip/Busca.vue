@@ -129,6 +129,7 @@ import ChipChangeStatus from "../../../components/ChipChangeStatus.vue";
 import ChipChangePlan from "../../../components/ChipChangePlan.vue";
 import { useHumanReadableBytes } from "../../../composable/useHumanReadableBytes";
 import SIMmanualInport from "../../../components/SIMmanualInport.vue";
+import axios from "axios";
 const verify = ref({
   client: null,
 });
@@ -214,7 +215,6 @@ const search = async () => {
         signal: controller.signal,
       }
     ); */
-    // downLink.value = res.data.downLink;
     let deno_url = `${VITE_API_DENO_URL}/v2/client/sims`;
     let response;
     if (verify.value?.client) {
@@ -228,6 +228,7 @@ const search = async () => {
 
     if (response) {
       searchResult.value = response.data.details;
+      downLink.value = response.data.downloadLink;
       // tags.value = response.data.tags;
     }
   } catch (error) {
@@ -257,25 +258,37 @@ const abortSearch = () => {
 const checkedRows = ref();
 
 const exportSelected = async (selected) => {
-  const response = await api({
-    url: downLink.value + "?" + selected.join("&"),
-    method: "GET",
-    responseType: "blob",
-  });
+  if (!downLink.value || !selected?.length) return;
 
-  const contentDisposition = response.headers["content-disposition"];
+  // Monta query string com múltiplos parâmetros "coluna=1"
+  const query = selected
+    .map((field) => `colunas[]=${encodeURIComponent(field)}`)
+    .join("&");
+  const url = `${downLink.value}&${query}`;
 
-  let filename = contentDisposition
-    ? contentDisposition.replace(/.*filename="?(.+\..{3,4})"?/, "$1")
-    : "resultado.csv";
+  try {
+    const response = await axios({
+      url,
+      method: "GET",
+      responseType: "blob",
+    });
 
-  const url = window.URL.createObjectURL(new Blob([response.data]));
-  const link = document.createElement("a");
-  link.href = url;
-  link.setAttribute("download", filename); // Nome do arquivo para download
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+    const contentDisposition = response.headers["content-disposition"];
+    const filename = contentDisposition
+      ? contentDisposition.replace(/.*filename="?(.+\..{3,4})"?/, "$1")
+      : "resultado.xlsx";
+
+    const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error("Erro ao exportar arquivo:", error);
+  }
 };
 
 const formCompleted = computed(
