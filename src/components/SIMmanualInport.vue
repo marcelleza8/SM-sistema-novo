@@ -94,7 +94,7 @@ const uploadFile = async () => {
     formData.append("operadora", selectedOperadoraOption.value);
 
     const response = await api.post(
-      `${import.meta.env.VITE_API_FLASK_URL}/upload/rpa-vivo`,
+      `${import.meta.env.VITE_API_FLASK_URL}upload/rpa-vivo`,
       formData
     );
 
