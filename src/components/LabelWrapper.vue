@@ -13,7 +13,7 @@ const tags = ref([]);
 const timerId = ref(0); //
 const loadTags = async () => {
   const response = await api.get(
-    `${import.meta.env.VITE_API_FLASK_URL}uploads/upload-progress`
+    `${import.meta.env.VITE_API_FLASK_URL}upload/upload-progress`
   );
 
   if (response) {
