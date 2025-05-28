@@ -180,7 +180,7 @@ const handleChangeStatus = async () => {
   let data = {};
 
   data["data"] = props.items.map((i) => ({
-    chipId: i.chipId,
+    chipId: i.chip_id,
     linha: i.linha,
     status: newStatus.value.id,
     iccid: null, //i.iccid.text,
