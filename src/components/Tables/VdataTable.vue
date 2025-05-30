@@ -19,7 +19,16 @@
         ></v-select>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="!allowDisplay">
+      <v-col>
+        <span
+          >O resultado é maior que 500 resultados, que pode travar ou deixar o
+          computador lento, deseja exibir?</span
+        >
+        <v-btn @click="displayVisibility = true">Exibir</v-btn>
+      </v-col>
+    </v-row>
+    <v-row v-else>
       <v-col>
         <v-data-table
           v-model="selectedItems"
@@ -36,6 +45,7 @@
           :mobile="null"
           :mobile-breakpoint="'sm'"
           :loading-text="'Buscando linhas da sua conta'"
+          :items-per-page-options="[10, 25, 50, 100, 500, 1000, 2000]"
           @update:model-value="onSelectionChange"
         >
           <template v-slot:top>
@@ -147,9 +157,17 @@ import Swal from "sweetalert2";
 // Define o método emit para comunicar com o componente pai
 const emit = defineEmits(["update:selected"]);
 
+const displayVisibility = ref(false);
+
 const props = defineProps({
   items: Object,
 });
+
+const allowDisplay = computed(
+  () =>
+    props.items.length < 500 ||
+    (props.items.length > 500 && displayVisibility.value)
+);
 
 const headers = ref([
   { title: "", value: "data-table-expand", width: "1%" }, // Coluna para expandir
