@@ -1,10 +1,29 @@
 <script setup>
+import Swal from "sweetalert2";
+
+const emit = defineEmits(["removeItem"]);
 defineProps({
   resultado: {
     type: Object,
     required: true,
   },
 });
+
+async function removeItem(item) {
+  return false;
+  const { isConfirmed } = await Swal.fire({
+    title: "Remover?",
+    text: "Deseja realmente remover este item?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sim, remover",
+    cancelButtonText: "Cancelar",
+  });
+
+  if (isConfirmed) {
+    emit("removeItem", item);
+  }
+}
 </script>
 
 <template>
@@ -16,7 +35,11 @@ defineProps({
       <h4 class="font-bold mb-2">{{ grupo }}</h4>
       <v-table>
         <tbody>
-          <tr v-for="item in items" :key="item.buscado || item">
+          <tr
+            @dblclick="removeItem(item.buscado)"
+            v-for="item in items"
+            :key="item.buscado || item"
+          >
             <template v-if="item.encontrado">
               <td :title="'Cliente'" v-if="item.encontrado.clients_name">
                 <span>
@@ -33,6 +56,11 @@ defineProps({
               </td>
               <td :title="'Telefone'">
                 {{ item.encontrado.phone_number }}
+              </td>
+              <td :title="'Operadora'">
+                <span>
+                  {{ item.encontrado.operators_name }}
+                </span>
               </td>
             </template>
             <template v-else>

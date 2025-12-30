@@ -2,7 +2,7 @@
   <v-sheet @click="openDelete" outlined :class="[statusClass, 'pa-1']" shaped>
     <v-card-title class="text-h6 pa-0 pl-4">{{ tag.title }}</v-card-title>
     <v-card-text>
-      <div class="mb-2 pl-2">{{ tag.description }}desch</div>
+      <div class="mb-2 pl-2">{{ tag.description }}</div>
       <div class="flex justify-between">
         <span class="text-subtitle mb-1">Progresso: {{ tag.progress }}%</span>
         <span v-if="tag.finished_at" class="text-subtitle">
@@ -34,13 +34,7 @@
   </v-dialog>
 
   <!-- Snackbar (toast) -->
-  <v-snackbar
-    v-model="snackbar"
-    :timeout="3000"
-    :color="snackbarColor"
-    top
-    right
-  >
+  <v-snackbar v-model="snackbar" :timeout="3000" :color="snackbarColor" top right>
     {{ snackbarMessage }}
     <template #action>
       <v-btn text @click="snackbar = false">Fechar</v-btn>
@@ -91,8 +85,7 @@ function onConfirm() {
 
 async function deleteItem() {
   const response = await axios.delete(
-    `${import.meta.env.VITE_API_FLASK_URL}upload/upload-progress/${
-      props.redisKey
+    `${import.meta.env.VITE_API_FLASK_URL}upload/upload-progress/${props.redisKey
     }`
   );
 
@@ -116,6 +109,7 @@ function showToast(message, color = "info") {
 .border-success {
   border: 1px solid rgb(var(--v-theme-success)) !important;
 }
+
 .border-warning {
   border: 1px solid rgb(var(--v-theme-warning)) !important;
 }

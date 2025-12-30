@@ -9,7 +9,7 @@
     </v-row>
 
     <v-row>
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="4">
         <v-btn
           color="warning"
           @click="validarLote"
@@ -20,7 +20,11 @@
         </v-btn>
       </v-col>
 
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="4">
+        <!-- <BuscadorSIM @item-encontrado="addItem" /> -->
+      </v-col>
+
+      <v-col cols="12" md="4">
         <v-row>
           <v-col cols="4">
             <v-text-field
@@ -49,19 +53,9 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="false">
-      <v-col
-        v-for="operadora in operadoras"
-        :key="operadora.id"
-        cols="12"
-        md="3"
-      >
-        <v-text-field
-          :label="`Preço - ${operadora.name}`"
-          v-model="form.precos[operadora.id]"
-          prefix="R$"
-          type="text"
-        />
+    <v-row>
+      <v-col cols="12">
+        <ChipPlanGroupManager :data="groupedByOperator" />
       </v-col>
     </v-row>
 
@@ -71,9 +65,10 @@
           v-model="inputState"
           placeholder="Digite linhas ou ICCIDs, um por linha"
         />
+        <!-- <v-textarea v-model="formatted" auto-grow></v-textarea> -->
       </v-col>
       <v-col cols="12" md="6">
-        <OutputLines :resultado="outputWarnings" />
+        <OutputLines @remove-item="removeItem" :resultado="outputWarnings" />
       </v-col>
     </v-row>
 
@@ -92,11 +87,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import api from "../../../api";
 import Swal from "sweetalert2";
 import LineInputField from "../../BuscaChipVerifier.vue";
 import OutputLines from "./outputLines.vue";
+import BuscadorSIM from "../../BuscadorSIM.vue";
+import ChipPlanGroupManager from "../../ChipPlanGroupManager.vue";
 
 const props = defineProps<{
   contract: {
@@ -124,6 +121,8 @@ const form = ref({
   comodato: "",
   precos: {},
 });
+
+const groupedByOperator = ref({});
 
 const inputState = ref({
   formatted: [] as string[],
@@ -157,6 +156,13 @@ async function validarLote() {
       },
       { encontrados: [], naoEncontrados: [] }
     );
+
+    groupedByOperator.value = result.reduce((acc, item) => {
+      const key = item.operators_name;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(item);
+      return acc;
+    }, {});
   } catch (err) {
     console.error(err);
     Swal.fire("Erro", "Falha ao validar lote.", "error");
@@ -196,6 +202,21 @@ async function salvarLote() {
     salvando.value = false;
   }
 }
+
+function addItem(item: any) {
+  console.log(item);
+
+  inputState.value.formatted.push(item.imei);
+  console.log(inputState.value);
+}
+
+function removeItem(item: any) {
+  //
+}
+
+const formatted = computed(() =>
+  Array.from(new Set(inputState.value.formatted)).join("\n")
+);
 </script>
 
 <style scoped>

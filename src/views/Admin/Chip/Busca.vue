@@ -79,18 +79,10 @@
             </fieldset>
             <fieldset class="border border-gray-700 px-4 py-1 pb-4 space-x-4">
               <legend class="font-semibold">EXPORTAR</legend>
-              <DropDown @exportSelected="exportSelected"></DropDown>
-              <v-btn
-                @click="exportCSV"
-                :disabled="!checkedRows?.length"
-                color="blue"
-                :title="
-                  !checkedRows?.length
-                    ? `Selecione as linhas que quer exportar`
-                    : `Exporta as ${checkedRows?.length} linhas selecionadas abaixo`
-                "
-                >Exportar selecionados</v-btn
-              >
+              <DropDown
+                @exportSelected="exportSelected"
+                :headers="headers"
+              ></DropDown>
             </fieldset>
           </div>
           <div class="flex justify-between py-2">
@@ -257,40 +249,6 @@ const abortSearch = () => {
 
 const checkedRows = ref();
 
-const exportSelected = async (selected) => {
-  if (!downLink.value || !selected?.length) return;
-
-  // Monta query string com múltiplos parâmetros "coluna=1"
-  const query = selected
-    .map((field) => `colunas[]=${encodeURIComponent(field)}`)
-    .join("&");
-  const url = `${downLink.value}&${query}`;
-
-  try {
-    const response = await axios({
-      url,
-      method: "GET",
-      responseType: "blob",
-    });
-
-    const contentDisposition = response.headers["content-disposition"];
-    const filename = contentDisposition
-      ? contentDisposition.replace(/.*filename="?(.+\..{3,4})"?/, "$1")
-      : "resultado.xlsx";
-
-    const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement("a");
-    link.href = blobUrl;
-    link.setAttribute("download", filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(blobUrl);
-  } catch (error) {
-    console.error("Erro ao exportar arquivo:", error);
-  }
-};
-
 const formCompleted = computed(
   () => !!verify.value.items?.formatted.length || verify.value.client
 );
@@ -359,50 +317,6 @@ function handleChangedPlan(data) {
     search();
   }
 }
-
-// Função para exportar os dados como CSV
-const exportCSV = () => {
-  const filteredHeaders = headers.value.filter(
-    (header) => header.value != "actions"
-  );
-
-  const csvContent = [
-    filteredHeaders.map((header) => header.title).join(";"),
-    checkedRows.value
-      .map((item) =>
-        filteredHeaders
-          .map((header) => {
-            let value = item[header.value] ?? "";
-
-            if (["linha", "iccid", "imeiAparelho"].includes(header.value)) {
-              return `="${value}"`;
-            } else if (
-              ["consumoTotal", "consumoDiario"].includes(header.value)
-            ) {
-              return useHumanReadableBytes().formatBytes(Number(value), "MB");
-            }
-            return value;
-          })
-          .join(";")
-      )
-      .join("\n"), // Linhas
-  ].join("\n");
-
-  // Adiciona o BOM ao início do conteúdo CSV
-  const bom = "\uFEFF";
-  const fullCsvContent = bom + csvContent;
-
-  // Cria um blob com o conteúdo CSV
-  const blob = new Blob([fullCsvContent], { type: "text/csv;charset=utf-8;" });
-
-  // Cria um link temporário para fazer o download do arquivo
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.setAttribute("download", "data.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
 </script>
 
 <style scoped>
