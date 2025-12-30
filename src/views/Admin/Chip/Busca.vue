@@ -6,11 +6,8 @@
     <div class="grid grid-cols-2" v-if="!searchResult.length">
       <div>
         <div class="space-x-6">
-          <button
-            @click="search"
-            :disabled="!formCompleted || searching"
-            class="primary disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
+          <button @click="search" :disabled="!formCompleted || searching"
+            class="primary disabled:bg-gray-400 disabled:cursor-not-allowed">
             Verificar Linhas
           </button>
           <button @click="abortSearch" class="text-red-500" v-if="searching">
@@ -18,20 +15,11 @@
           </button>
         </div>
         <div>
-          <SelectAjaxVue
-            :disabled="searching"
-            label="Selecione um cliente"
-            @enterPressed="search"
-            v-model="verify.client"
-            url="admin/clientes/buscar"
-          />
+          <SelectAjaxVue :disabled="searching" label="Selecione um cliente" @enterPressed="search"
+            v-model="verify.client" url="admin/clientes/buscar" />
           <div class="mt-4 text-center grid grid-cols-2">
-            <BuscaChipverifier
-              :disabled="searching"
-              v-model="verify.items"
-              class="inline-block"
-              placeholder="Informe o ICC ou os numeros da linha"
-            />
+            <BuscaChipverifier :disabled="searching" v-model="verify.items" class="inline-block"
+              placeholder="Informe o ICC ou os numeros da linha" />
             <div v-if="verify?.items?.unFormatted.length">
               <p class="mb-4">Itens ignorados</p>
               <ul>
@@ -51,54 +39,30 @@
           <div class="flex justify-between py-2">
             <fieldset class="border border-gray-700 px-4 py-1 pb-4 space-x-4">
               <legend class="font-semibold">CONSULTA</legend>
-              <v-btn
-                color="green-lighten-2"
-                :disabled="searching"
+              <v-btn color="green-lighten-2" :disabled="searching"
                 class="bg-green-100 text-green-800 dark:bg-gray-700 dark:text-green-400 border border-green-400 disabled:bg-gray-500"
-                @click="reset"
-                title="Faça uma nova consulta"
-              >
+                @click="reset" title="Faça uma nova consulta">
                 Nova
               </v-btn>
-              <v-btn
-                color="orange"
-                title="Altere alguma informação da consulta atual"
-                :disabled="searching"
-                @click="edit"
-              >
+              <v-btn color="orange" title="Altere alguma informação da consulta atual" :disabled="searching"
+                @click="edit">
                 Editar
               </v-btn>
-              <v-btn
-                color="green"
-                :disabled="searching"
-                title="Refaz a consulta atual"
-                @click="search"
-              >
+              <v-btn color="green" :disabled="searching" title="Refaz a consulta atual" @click="search">
                 Atualizar
               </v-btn>
             </fieldset>
             <fieldset class="border border-gray-700 px-4 py-1 pb-4 space-x-4">
               <legend class="font-semibold">EXPORTAR</legend>
-              <DropDown
-                @exportSelected="exportSelected"
-                :headers="headers"
-              ></DropDown>
+              <DropDown @exportSelected="exportSelected" :headers="headers"></DropDown>
             </fieldset>
           </div>
           <div class="flex justify-between py-2">
-            <fieldset
-              class="border border-gray-700 px-4 py-1 pb-4 space-x-4 w-full"
-            >
+            <fieldset class="border border-gray-700 px-4 py-1 pb-4 space-x-4 w-full">
               <legend class="font-semibold">Alterar SIM cards</legend>
 
-              <ChipChangeStatus
-                :items="checkedRows"
-                @changed="handleChangedStatus"
-              />
-              <ChipChangePlan
-                :items="checkedRows"
-                @changed="handleChangedPlan"
-              />
+              <ChipChangeStatus :items="checkedRows" @changed="handleChangedStatus" />
+              <ChipChangePlan :items="checkedRows" @changed="handleChangedPlan" />
             </fieldset>
           </div>
         </div>
@@ -239,6 +203,44 @@ const search = async () => {
 
   clearInterval(timerId.value);
   searching.value = false;
+};
+
+const exportSelected = async (selected) => {
+
+  if (!downLink.value || !selected?.length) return;
+
+  // Monta query string com múltiplos parâmetros "coluna=1"
+  const query = selected
+    .map((field) => `colunas[]=${encodeURIComponent(field)}`)
+    .join("&");
+  const url = `${downLink.value}&${query}`;
+
+  try {
+    const response = await axios({
+      url,
+      method: "GET",
+      responseType: "blob",
+    });
+
+    console.log(response);
+
+
+    const contentDisposition = response.headers["content-disposition"];
+    const filename = contentDisposition
+      ? contentDisposition.replace(/.*filename="?(.+\..{3,4})"?/, "$1")
+      : "resultado.xlsx";
+
+    const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error("Erro ao exportar arquivo:", error);
+  }
 };
 
 const abortSearch = () => {
