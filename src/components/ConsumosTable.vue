@@ -16,6 +16,7 @@
           { title: 'Último acesso', value: 'ultimo_acesso' },
           { title: 'SMS Mensal', value: 'consumo_sms_mensal' },
           { title: 'IMEI Dispositivo', value: 'imei_aparelho' },
+          { title: 'APN', value: 'apn' },
         ]"
       >
         <template v-slot:top>
