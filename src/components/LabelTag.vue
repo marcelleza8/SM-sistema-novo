@@ -74,7 +74,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { formatInTimeZone } from "date-fns-tz";
-import axios from "axios";
+import denoApi from "../denoApi";
 import { useRoute } from "vue-router";
 
 const timeZone = "America/Sao_Paulo";
@@ -176,10 +176,7 @@ function onConfirm() {
 }
 
 async function deleteItem() {
-  const response = await axios.delete(
-    `${import.meta.env.VITE_API_DENO_URL}/v2/upload/upload-progress/${props.redisKey
-    }`
-  );
+  const response = await denoApi.delete(`/v2/upload/upload-progress/${props.redisKey}`);
 
   showToast("Item deletado com sucesso", "success");
 }

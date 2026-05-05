@@ -28,7 +28,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import LabelTag from "./LabelTag.vue";
-import api from "../api";
+import denoApi from "../denoApi";
 
 const tags = ref([]);
 const timerId = ref(0);
@@ -92,9 +92,7 @@ const normalizeTag = (tag) => ({
 });
 
 const loadTags = async () => {
-  const response = await api.get(
-    `${import.meta.env.VITE_API_DENO_URL}/v2/upload/upload-progress`
-  );
+  const response = await denoApi.get("/v2/upload/upload-progress");
 
   if (response) {
     const responseTags = Array.isArray(response.data?.tags)

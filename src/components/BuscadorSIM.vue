@@ -1,16 +1,12 @@
 <script setup>
 import Swal from "sweetalert2";
-import axios from "axios";
+import denoApi from "../denoApi";
 import { defineEmits } from "vue";
 
 const emit = defineEmits(["item-encontrado"]);
-const VITE_API_DENO_URL = import.meta.env.VITE_API_DENO_URL;
-
-let deno_url = `${VITE_API_DENO_URL}/v2/client/sims`;
-
 // Busca usando POST com um array no body
 async function buscarNoBackend(valor) {
-  const res = await axios.post(deno_url, { values: [valor] });
+  const res = await denoApi.post("/v2/client/sims", { values: [valor] });
   return res.data;
 }
 

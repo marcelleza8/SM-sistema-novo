@@ -76,6 +76,7 @@
 import { computed, ref } from "vue";
 import Swal from "sweetalert2";
 import api from "../../../api";
+import denoApi from "../../../denoApi";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import SelectAjaxVue from "../../../components/SelectAjax.vue";
 import BuscaChipverifier from "../../../components/BuscaChipVerifier.vue";
@@ -148,7 +149,6 @@ const headers = ref([
 ]);
 
 const search = async () => {
-  const VITE_API_DENO_URL = import.meta.env.VITE_API_DENO_URL;
   searching.value = true;
   searchResult.value = [];
   filters.value = {};
@@ -171,13 +171,11 @@ const search = async () => {
         signal: controller.signal,
       }
     ); */
-    let deno_url = `${VITE_API_DENO_URL}/v2/client/sims`;
     let response;
     if (verify.value?.client) {
-      deno_url = `${VITE_API_DENO_URL}/v2/client/${verify.value.client}/simcards`;
-      response = await api.get(deno_url);
+      response = await denoApi.get(`/v2/client/${verify.value.client}/simcards`);
     } else {
-      response = await api.post(deno_url, {
+      response = await denoApi.post("/v2/client/sims", {
         values: verify.value.items.formatted,
       });
     }
