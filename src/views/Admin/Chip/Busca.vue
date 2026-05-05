@@ -100,39 +100,44 @@ const timer = ref(0);
 let controller;
 
 const headers = ref([
-  { title: "Cliente", value: "cliente", sortable: true, nowrap: true },
-  { title: "Linha", value: "linha", sortable: true, nowrap: true },
-  { title: "ICCID", value: "iccid", sortable: true, nowrap: true },
-  { title: "Status", value: "status", sortable: true, nowrap: true },
+  { title: "Cliente", value: "clients_name", sortable: true, nowrap: true },
+  { title: "Linha", value: "phone_number", sortable: true, nowrap: true },
+  { title: "ICCID", value: "imei", sortable: true, nowrap: true },
+  { title: "Status", value: "status_name", sortable: true, nowrap: true },
   {
     title: "Plano",
-    value: "plano",
+    value: "plan_name",
     sortable: true,
     nowrap: true,
   },
-  { title: "Operadora", value: "operadora", sortable: true, nowrap: true },
+  {
+    title: "Operadora",
+    value: "operators_name",
+    sortable: true,
+    nowrap: true,
+  },
   {
     title: "Último Acesso",
-    value: "ultimoAcesso",
+    value: "ultimo_acesso",
     sortable: true,
     nowrap: true,
   },
   { title: "Conexão", value: "conexao", sortable: true, nowrap: true },
   {
     title: "Consumo Total",
-    value: "consumoTotal",
+    value: "consumo_total",
     sortable: true,
     nowrap: true,
   },
   {
     title: "SMS",
-    value: "consumoSMS",
+    value: "consumo_sms_mensal",
     sortable: true,
     nowrap: true,
   },
   {
     title: "IMEI Dispositivo",
-    value: "imeiAparelho",
+    value: "imei_aparelho",
     sortable: true,
     nowrap: true,
   },
@@ -141,7 +146,7 @@ const headers = ref([
   { title: "APN", value: "apn", sortable: true, nowrap: true },
   {
     title: "Status na operadora",
-    value: "statusOperadora",
+    value: "status_operadora",
     sortable: true,
     nowrap: true,
   },
