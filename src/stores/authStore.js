@@ -13,12 +13,12 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async login(credentials) {
       // Faz a requisição para autenticação e obtenção do token
-      const response = await api.post("/oauth/token", {
+      const response = await api.post("oauth/token", {
         ...credentials,
-        grant_type: import.meta.env.VITE_GRANT_TYPE,
+        grant_type: import.meta.env.VITE_GRANT_TYPE || "password",
         client_id: import.meta.env.VITE_CLIENT_ID,
         client_secret: import.meta.env.VITE_CLIENT_SECRET,
-        scope: import.meta.env.VITE_SCOPE,
+        scope: import.meta.env.VITE_SCOPE || "",
       });
 
       // Armazena o token com uma expiração de 1 hora (60 minutos)
