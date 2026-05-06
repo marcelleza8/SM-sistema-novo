@@ -41,6 +41,12 @@
         <h1>{{ timer }}</h1>
       </v-card>
       <v-card class="mt-5" v-if="relatorio?.length">
+        <v-card-title class="d-flex justify-space-between align-center">
+          <span>Resultado</span>
+          <v-btn color="primary" variant="outlined" @click="exportarCsv">
+            Exportar CSV
+          </v-btn>
+        </v-card-title>
         <div class="grid place-items-center my-4">
           <SIMPerPlanTable :SIMDetails="SIMDetails" />
         </div>
@@ -48,9 +54,7 @@
           <!-- Customização do campo de consumo total -->
           <template v-slot:item.consumo_total="{ item }">
             {{
-              item.consumo_total
-                ? useHumanReadableBytes().formatBytes(item.consumo_total, "MB")
-                : ""
+              item.consumo_total ? humanReadableBytes.formatBytes(item.consumo_total, "MB") : ""
             }}
           </template>
           <template #item.created_at="{ item }">
@@ -148,6 +152,7 @@ const selectedChipIdToEdit = ref(0);
 
 const { timer, start, pause, reset } = useTimer();
 const dateUtils = useDateUtils();
+const humanReadableBytes = useHumanReadableBytes();
 
 const headers = [
   { title: "Telefone", key: "phone_number" },
@@ -230,6 +235,50 @@ const copiarTexto = (texto: string) => {
 const openEditDialog = (chipId: string) => {
   selectedChipIdToEdit.value = chipId;
   editChipDialog.value = true;
+};
+
+const escapeCsvValue = (value: unknown) => {
+  const text = String(value ?? "");
+  const escaped = text.replace(/"/g, '""');
+  return /[;"\n]/.test(escaped) ? `"${escaped}"` : escaped;
+};
+
+const getExportValue = (item: any, key: string) => {
+  if (key === "consumo_total") {
+    return item?.consumo_total
+      ? humanReadableBytes.formatBytes(item.consumo_total, "MB")
+      : "";
+  }
+
+  if (key === "created_at" || key === "deleted_at") {
+    return dateUtils.formatDate(item?.[key] || "", "dd/MM/yyyy");
+  }
+
+  return item?.[key] ?? "";
+};
+
+const exportarCsv = () => {
+  const columns = headers.filter((header) => header.key && header.key !== "actions");
+
+  const csvLines = [
+    columns.map((column) => escapeCsvValue(column.title)).join(";"),
+    ...relatorio.value.map((item) =>
+      columns.map((column) => escapeCsvValue(getExportValue(item, column.key))).join(";")
+    ),
+  ];
+
+  const blob = new Blob(["\uFEFF" + csvLines.join("\n")], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const fileName = `relatorio_consumo_${mesAno.value || new Date().toISOString().slice(0, 10)}.csv`;
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute("download", fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
 };
 
 async function fetchContracts() {
