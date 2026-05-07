@@ -5,6 +5,7 @@
         <div class="card-title">{{ tag.title }}</div>
         <v-btn icon="mdi-close" color="red" variant="text" size="small" @click.stop="openDelete" />
       </div>
+      <div class="card-subtitle" v-html="tag.subtitle || '&nbsp;'"></div>
 
       <div v-if="primaryMessage" class="message-block">
         <div class="message-row">
@@ -238,6 +239,13 @@ function showToast(message, color = "info") {
   font-size: 1.1rem;
   font-weight: 600;
   line-height: 1.3;
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+  line-height: 1.3;
+  min-height: 1.3em;
 }
 
 .message-block {
