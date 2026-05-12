@@ -6,7 +6,7 @@
           <v-text-field v-model="search" label="Buscar por operadora" />
         </v-col>
         <v-col class="d-flex justify-end">
-          <v-btn v-if="false" @click="openDialog(null)" color="primary"
+          <v-btn @click="openDialog(null)" color="primary"
             >Adicionar Operadora</v-btn
           >
         </v-col>
