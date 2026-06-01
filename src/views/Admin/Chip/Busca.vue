@@ -186,7 +186,7 @@ const search = async () => {
     }
 
     if (response) {
-      searchResult.value = response.data.details;
+      searchResult.value = response.data.details ?? [];
       downLink.value = response.data.downloadLink;
       // tags.value = response.data.tags;
     }
