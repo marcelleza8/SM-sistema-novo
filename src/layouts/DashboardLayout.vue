@@ -3,9 +3,16 @@
     <!-- Cabeçalho -->
     <header
       v-if="!showOnlyContent"
-      class="bg-blue-500 text-white p-4 flex justify-between"
+      class="bg-blue-500 text-white p-4 flex justify-between items-center"
     >
-      <RouterLink :to="{ name: 'Admin/Dashboard' }">{{ APPNAME }}</RouterLink>
+      <div class="flex items-center space-x-6">
+        <RouterLink :to="{ name: 'Admin/Dashboard' }">{{ APPNAME }}</RouterLink>
+        <RouterLink
+          :to="{ name: 'AdminKnowledgeBase' }"
+          class="text-sm hover:underline"
+          >Base de Conhecimento</RouterLink
+        >
+      </div>
       <span class="cursor-pointer" @click="logout">LOGOUT</span>
     </header>
 
