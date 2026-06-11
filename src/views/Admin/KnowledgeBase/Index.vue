@@ -43,10 +43,17 @@
               <v-progress-linear v-if="loadingTree" indeterminate class="mb-2"></v-progress-linear>
               <KbTree
                 :nodes="tree"
+                :parent-note-id="null"
                 :selected-note-id="note ? note.id : null"
                 @select="(node) => selectNoteId(node.note_id)"
                 @add-child="(node) => newNote(node.note_id)"
+                @clone-request="openCloneDialog"
+                @delete-request="deletePlacement"
+                @move="onMove"
               />
+              <div class="text-caption text-disabled mt-2">
+                Arraste para reordenar ou mover. Solte sobre um item para colocá-lo dentro.
+              </div>
               <div v-if="!loadingTree && !tree.length" class="text-disabled text-caption pa-2">
                 Nenhuma nota. Crie a primeira no botão +.
               </div>
@@ -124,6 +131,38 @@
       @restored="onRestored"
     />
 
+    <!-- Diálogo de clonar -->
+    <v-dialog v-model="cloneDialog.open" max-width="520">
+      <v-card>
+        <v-card-title>Clonar nota</v-card-title>
+        <v-card-text>
+          <p class="text-body-2 mb-3">
+            Criar uma referência de
+            <strong>{{ cloneDialog.sourceTitle }}</strong>
+            em outro lugar. A nota é a mesma — editar num ponto reflete em todos.
+          </p>
+          <v-autocomplete
+            v-model="cloneDialog.targetParentId"
+            :items="parentOptions"
+            item-title="title"
+            item-value="value"
+            label="Colocar dentro de"
+            density="compact"
+            clearable
+            hide-details
+          />
+          <div class="text-caption text-disabled mt-1">
+            Deixe vazio para clonar na raiz.
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn variant="text" @click="cloneDialog.open = false">Cancelar</v-btn>
+          <v-btn color="primary" :loading="cloneDialog.saving" @click="doClone">Clonar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
       {{ snackbar.text }}
     </v-snackbar>
@@ -148,6 +187,14 @@ const historyOpen = ref(false);
 
 const searchTerm = ref("");
 const searchResults = ref(null);
+
+const cloneDialog = reactive({
+  open: false,
+  sourceNoteId: null,
+  sourceTitle: "",
+  targetParentId: null,
+  saving: false,
+});
 
 const typeItems = [
   { title: "Nota", value: "note" },
@@ -174,6 +221,9 @@ const renderedContent = computed(() => {
   }
   return DOMPurify.sanitize(marked.parse(form.content));
 });
+
+// Opções de destino para clonar/mover: todas as notas com seu caminho.
+const parentOptions = computed(() => flattenNotes(tree.value, []));
 
 onMounted(loadTree);
 
@@ -270,6 +320,104 @@ function findBranchId(nodes, noteId) {
     }
   }
   return null;
+}
+
+// ---- Clonar ----
+function openCloneDialog(node) {
+  cloneDialog.sourceNoteId = node.note_id;
+  cloneDialog.sourceTitle = node.title;
+  cloneDialog.targetParentId = null;
+  cloneDialog.open = true;
+}
+
+async function doClone() {
+  cloneDialog.saving = true;
+  try {
+    await kbApi.cloneNote(cloneDialog.sourceNoteId, cloneDialog.targetParentId);
+    cloneDialog.open = false;
+    await loadTree();
+    toast("Clonado");
+  } catch (e) {
+    toast(cycleOr(e, "Erro ao clonar"), "error");
+  } finally {
+    cloneDialog.saving = false;
+  }
+}
+
+// ---- Excluir posição (ramo) ----
+async function deletePlacement(node) {
+  if (!confirm(`Remover "${node.title}" desta posição?`)) return;
+  await kbApi.deleteBranch(node.branch_id);
+  if (note.value && note.value.id === node.note_id) {
+    // se a nota foi totalmente removida (era a última posição), limpa o editor
+    try {
+      await kbApi.getNote(node.note_id);
+    } catch (e) {
+      note.value = null;
+    }
+  }
+  await loadTree();
+  toast("Removido desta posição");
+}
+
+// ---- Mover / reordenar (drag-and-drop) ----
+async function onMove({ branchId, targetParentId, beforeBranchId }) {
+  const siblings = getSiblingBranchIds(tree.value, targetParentId).filter(
+    (id) => id !== branchId
+  );
+  let insertAt = beforeBranchId == null ? siblings.length : siblings.indexOf(beforeBranchId);
+  if (insertAt < 0) insertAt = siblings.length;
+  siblings.splice(insertAt, 0, branchId);
+
+  try {
+    await kbApi.moveBranch(branchId, { parent_id: targetParentId });
+    await kbApi.reorder(targetParentId, siblings);
+    await loadTree();
+  } catch (e) {
+    toast(cycleOr(e, "Não foi possível mover"), "error");
+    await loadTree(); // reverte o estado visual
+  }
+}
+
+// Branch ids dos filhos de um pai (null = raiz), na ordem atual.
+function getSiblingBranchIds(nodes, parentNoteId) {
+  if (parentNoteId === null) {
+    return nodes.map((n) => n.branch_id);
+  }
+  for (const n of nodes) {
+    if (n.note_id === parentNoteId) {
+      return (n.children || []).map((c) => c.branch_id);
+    }
+    if (n.children && n.children.length) {
+      const found = getSiblingBranchIds(n.children, parentNoteId);
+      if (found.length) return found;
+    }
+  }
+  return [];
+}
+
+// Achata a árvore em opções { title: "A / B / C", value: noteId }, sem duplicar nota.
+function flattenNotes(nodes, prefix) {
+  const out = [];
+  const seen = new Set();
+  const walk = (list, path) => {
+    for (const n of list) {
+      const full = [...path, n.title];
+      if (!seen.has(n.note_id)) {
+        seen.add(n.note_id);
+        out.push({ title: full.join(" / "), value: n.note_id });
+      }
+      if (n.children && n.children.length) walk(n.children, full);
+    }
+  };
+  walk(nodes, prefix);
+  return out;
+}
+
+// Extrai mensagem de erro de ciclo (422) do back, senão usa o fallback.
+function cycleOr(e, fallback) {
+  const msg = e && e.response && e.response.data && e.response.data.message;
+  return msg || fallback;
 }
 
 function formatDate(value) {
