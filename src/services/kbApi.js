@@ -46,4 +46,13 @@ export default {
   revert(noteId, revisionId) {
     return api.post(`${base}/notes/${noteId}/revert/${revisionId}`);
   },
+  trash() {
+    return api.get(`${base}/trash`);
+  },
+  restoreNote(noteId, parentId = null) {
+    return api.post(`${base}/trash/${noteId}/restore`, { parent_id: parentId });
+  },
+  forceDeleteNote(noteId) {
+    return api.delete(`${base}/trash/${noteId}`);
+  },
 };

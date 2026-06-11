@@ -49,11 +49,25 @@
               <v-spacer></v-spacer>
               <v-btn color="primary" size="small" :loading="reverting" @click="restore">
                 <v-icon start>mdi-restore</v-icon>
-                Restaurar esta versão
+                Restaurar
               </v-btn>
             </div>
+
+            <v-btn-toggle v-model="viewMode" density="compact" mandatory class="mb-3">
+              <v-btn value="content" size="x-small"><v-icon start>mdi-text</v-icon>Conteúdo</v-btn>
+              <v-btn value="diff" size="x-small"><v-icon start>mdi-vector-difference</v-icon>Diferenças</v-btn>
+            </v-btn-toggle>
+
             <v-divider class="mb-3"></v-divider>
-            <div class="kb-preview" v-html="renderedContent"></div>
+
+            <div v-if="viewMode === 'content'" class="kb-preview" v-html="renderedContent"></div>
+            <div v-else class="kb-preview">
+              <div class="text-caption text-disabled mb-2">
+                Comparando com a versão anterior
+                <span v-if="!hasPrevious">(esta é a primeira versão)</span>
+              </div>
+              <pre class="kb-diff"><template v-for="(part, i) in diffParts" :key="i"><span :class="part.cls">{{ part.text }}</span></template></pre>
+            </div>
           </div>
           <div v-else class="text-disabled d-flex align-center justify-center fill-height">
             Selecione uma versão para visualizar.
@@ -68,6 +82,7 @@
 import { ref, computed, watch } from "vue";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
+import { diffLines } from "diff";
 import kbApi from "../../../services/kbApi";
 
 const props = defineProps({
@@ -79,6 +94,9 @@ const emit = defineEmits(["update:modelValue", "restored"]);
 
 const revisions = ref([]);
 const selected = ref(null);
+const previousContent = ref(null);
+const hasPrevious = ref(false);
+const viewMode = ref("content");
 const loading = ref(false);
 const reverting = ref(false);
 
@@ -88,6 +106,17 @@ const renderedContent = computed(() => {
     return DOMPurify.sanitize(selected.value.content);
   }
   return DOMPurify.sanitize(marked.parse(selected.value.content));
+});
+
+// Diferenças, por linha, entre a versão anterior e a selecionada.
+const diffParts = computed(() => {
+  if (!selected.value) return [];
+  const before = previousContent.value || "";
+  const after = selected.value.content || "";
+  return diffLines(before, after).map((p) => ({
+    text: p.value,
+    cls: p.added ? "diff-add" : p.removed ? "diff-del" : "diff-eq",
+  }));
 });
 
 watch(
@@ -100,6 +129,7 @@ watch(
 async function loadRevisions() {
   loading.value = true;
   selected.value = null;
+  viewMode.value = "content";
   try {
     const { data } = await kbApi.revisions(props.noteId);
     revisions.value = data;
@@ -111,6 +141,17 @@ async function loadRevisions() {
 async function preview(rev) {
   const { data } = await kbApi.getRevision(props.noteId, rev.id);
   selected.value = data;
+
+  // A lista vem da mais recente para a mais antiga: a anterior é a próxima no array.
+  const idx = revisions.value.findIndex((r) => r.id === rev.id);
+  const older = idx >= 0 ? revisions.value[idx + 1] : null;
+  hasPrevious.value = !!older;
+  if (older) {
+    const res = await kbApi.getRevision(props.noteId, older.id);
+    previousContent.value = res.data.content || "";
+  } else {
+    previousContent.value = "";
+  }
 }
 
 async function restore() {
@@ -142,5 +183,25 @@ function formatDate(value) {
 }
 .kb-preview :deep(p) {
   margin: 0.4em 0;
+}
+.kb-diff {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+}
+.kb-diff .diff-add {
+  background: rgba(46, 160, 67, 0.22);
+  display: block;
+}
+.kb-diff .diff-del {
+  background: rgba(248, 81, 73, 0.22);
+  text-decoration: line-through;
+  display: block;
+}
+.kb-diff .diff-eq {
+  color: rgba(0, 0, 0, 0.6);
+  display: block;
 }
 </style>

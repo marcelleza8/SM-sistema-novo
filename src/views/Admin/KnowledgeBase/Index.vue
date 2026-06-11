@@ -19,6 +19,9 @@
               <v-btn class="ml-2" color="primary" size="small" icon title="Nova nota na raiz" @click="newNote(null)">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
+              <v-btn class="ml-1" size="small" icon variant="text" title="Lixeira" @click="trashOpen = true">
+                <v-icon>mdi-delete-clock</v-icon>
+              </v-btn>
             </div>
 
             <!-- Resultados de busca -->
@@ -131,6 +134,8 @@
       @restored="onRestored"
     />
 
+    <KbTrashDialog v-model="trashOpen" @changed="loadTree" />
+
     <!-- Diálogo de clonar -->
     <v-dialog v-model="cloneDialog.open" max-width="520">
       <v-card>
@@ -176,6 +181,7 @@ import DOMPurify from "dompurify";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import KbTree from "./KbTree.vue";
 import KbHistoryDialog from "./KbHistoryDialog.vue";
+import KbTrashDialog from "./KbTrashDialog.vue";
 import kbApi from "../../../services/kbApi";
 
 const tree = ref([]);
@@ -184,6 +190,7 @@ const note = ref(null);
 const saving = ref(false);
 const mode = ref("edit");
 const historyOpen = ref(false);
+const trashOpen = ref(false);
 
 const searchTerm = ref("");
 const searchResults = ref(null);
