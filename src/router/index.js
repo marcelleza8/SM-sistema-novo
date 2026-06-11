@@ -181,6 +181,14 @@ const routes = [
           },
         ],
       },
+      {
+        path: "base-conhecimento",
+        name: "AdminKnowledgeBase",
+        component: () => import("../views/Admin/KnowledgeBase/Index.vue"),
+        meta: {
+          title: "Base de Conhecimento",
+        },
+      },
     ],
   },
 ];
