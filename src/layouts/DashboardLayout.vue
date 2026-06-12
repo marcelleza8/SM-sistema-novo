@@ -5,20 +5,26 @@
       v-if="!showOnlyContent"
       class="bg-blue-500 text-white p-4 flex justify-between items-center"
     >
-      <div class="flex items-center space-x-6">
-        <RouterLink :to="{ name: 'Admin/Dashboard' }">{{ APPNAME }}</RouterLink>
-        <RouterLink
-          :to="{ name: 'AdminKnowledgeBase' }"
-          class="text-sm hover:underline"
-          >Base de Conhecimento</RouterLink
-        >
-      </div>
-      <span class="cursor-pointer" @click="logout">LOGOUT</span>
+      <RouterLink :to="{ name: 'Admin/Dashboard' }" class="font-semibold">{{ APPNAME }}</RouterLink>
+      <button class="cursor-pointer hover:text-gray-200" title="Sair" @click="logout">
+        <i class="mdi mdi-logout text-2xl leading-none"></i>
+      </button>
     </header>
 
     <!-- Menu Superior -->
-    <nav v-if="!showOnlyContent" class="bg-gray-200 p-4">
-      <!-- Links do Menu -->
+    <nav
+      v-if="!showOnlyContent"
+      class="bg-gray-200 px-4 py-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm"
+    >
+      <RouterLink class="nav-link" :to="{ name: 'Admin/Dashboard' }">Dashboard</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'Admin/Chip/Busca' }">Busca de Chip</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'AdminOperadoraListPage' }">Operadoras</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'AdminChipListPage' }">SIM card</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'AdminOperadoraAccountListPage' }">Contas de operadora</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'AdminSystemJobsList' }">Jobs</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'ReportConsumption' }">Relatório consumo</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'AdminContractListPage' }">Contratos</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'AdminKnowledgeBase' }">Base de Conhecimento</RouterLink>
     </nav>
 
     <!-- Área do Dashboard -->
@@ -59,5 +65,17 @@ const logout = async () => {
 </script>
 
 <style>
-/* Estilos adicionais se necessário */
+.nav-link {
+  color: #374151;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+.nav-link:hover {
+  color: #2563eb;
+}
+.nav-link.router-link-active {
+  color: #2563eb;
+  font-weight: 600;
+  border-bottom-color: #2563eb;
+}
 </style>
