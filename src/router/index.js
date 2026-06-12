@@ -189,6 +189,14 @@ const routes = [
           title: "Base de Conhecimento",
         },
       },
+      {
+        path: "documentos-contrato",
+        name: "AdminContractDocuments",
+        component: () => import("../views/Admin/ContractDocuments/Index.vue"),
+        meta: {
+          title: "Documentos de Contrato",
+        },
+      },
     ],
   },
 ];
