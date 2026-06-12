@@ -25,6 +25,7 @@
       <RouterLink class="nav-link" :to="{ name: 'ReportConsumption' }">Relatório consumo</RouterLink>
       <RouterLink class="nav-link" :to="{ name: 'AdminContractListPage' }">Contratos</RouterLink>
       <RouterLink class="nav-link" :to="{ name: 'AdminKnowledgeBase' }">Base de Conhecimento</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'AdminContractDocuments' }">Documentos de Contrato</RouterLink>
     </nav>
 
     <!-- Área do Dashboard -->

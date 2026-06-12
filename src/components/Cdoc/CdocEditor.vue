@@ -129,6 +129,7 @@ import { ref } from "vue";
 
 import { useCdocCatalog } from "../../composables/useCdocCatalog";
 import { createMustacheExtension } from "./mustacheSuggestion";
+import { MustacheHighlight } from "./mustacheHighlight";
 import "tippy.js/dist/tippy.css";
 
 const props = defineProps({
@@ -151,6 +152,7 @@ const editor = useEditor({
     TableRow,
     TableHeader,
     TableCell,
+    MustacheHighlight,
     createMustacheExtension((query) => catalog.filter(query)),
   ],
   onUpdate: ({ editor }) => {
@@ -197,45 +199,100 @@ onBeforeUnmount(() => editor.value && editor.value.destroy());
 
 <style scoped>
 .cdoc-editor {
-  border: 1px solid rgba(0, 0, 0, 0.18);
-  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
   overflow: hidden;
+  background: #eceef1;
 }
 .cdoc-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 2px;
-  padding: 4px 6px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  background: #fafafa;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
+
+/* Canvas cinza onde a "folha" flutua */
 .cdoc-content {
-  min-height: 380px;
-  max-height: 60vh;
+  min-height: 420px;
+  max-height: 64vh;
   overflow-y: auto;
-  padding: 12px 16px;
-  background: #fff;
+  padding: 28px 16px;
+  background: #eceef1;
 }
+
+/* Folha de documento (estilo Word) */
 :deep(.ProseMirror) {
   outline: none;
-  min-height: 360px;
+  min-height: 560px;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 56px 64px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.12);
+  color: #1f2329;
+  font-size: 15px;
+  line-height: 1.7;
+}
+:deep(.ProseMirror h1) {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin: 0.6em 0 0.4em;
+}
+:deep(.ProseMirror h2) {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0.6em 0 0.4em;
+}
+:deep(.ProseMirror p) {
+  margin: 0 0 0.7em;
+}
+:deep(.ProseMirror ul),
+:deep(.ProseMirror ol) {
+  padding-left: 1.4em;
+  margin: 0 0 0.7em;
 }
 :deep(.ProseMirror table) {
   border-collapse: collapse;
   width: 100%;
+  margin: 0.5em 0;
 }
 :deep(.ProseMirror td),
 :deep(.ProseMirror th) {
-  border: 1px solid #bbb;
-  padding: 4px 8px;
+  border: 1px solid #cdd2d8;
+  padding: 6px 10px;
 }
 :deep(.ProseMirror th) {
-  background: #f0f0f0;
+  background: #f4f5f7;
+  font-weight: 600;
 }
 :deep(.ProseMirror blockquote) {
-  border-left: 3px solid #ccc;
-  padding-left: 12px;
+  border-left: 3px solid #ce4b6c;
+  padding-left: 14px;
   color: #555;
+  margin: 0.6em 0;
+}
+:deep(.ProseMirror a) {
+  color: #ce4b6c;
+  text-decoration: underline;
+}
+
+/* Pílula das variáveis {{ }} */
+:deep(.ProseMirror .cdoc-var) {
+  background: rgba(206, 75, 108, 0.12);
+  color: #b23457;
+  border: 1px solid rgba(206, 75, 108, 0.28);
+  border-radius: 5px;
+  padding: 1px 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  white-space: nowrap;
 }
 </style>
