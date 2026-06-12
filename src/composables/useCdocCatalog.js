@@ -30,10 +30,13 @@ function flatten(entities) {
     });
 
     // Relações -> aprofunda (evitando ciclo na mesma cadeia).
+    // O valor pode ser uma string (entityKey) ou um objeto de relação
+    // virtual ({ entity, via, where }).
     const relations = entity.relations || {};
     Object.keys(relations).forEach((rel) => {
-      const targetKey = relations[rel];
-      if (visited.includes(targetKey)) return;
+      const def = relations[rel];
+      const targetKey = typeof def === "string" ? def : def && def.entity;
+      if (!targetKey || visited.includes(targetKey)) return;
       const target = entities[targetKey];
       if (!target) return;
       walk(

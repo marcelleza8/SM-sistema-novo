@@ -43,4 +43,29 @@ export default {
   deleteTemplate(templateId) {
     return api.delete(`${base}/templates/${templateId}`);
   },
+
+  // ----- Resolver template -> registro -----
+  resolveTemplate(templateId, entity, id) {
+    // Retorna { name, type_id, content (mustaches conhecidos resolvidos), missing[] }
+    return api.post(`${base}/templates/${templateId}/resolver`, { entity, id });
+  },
+
+  // ----- Documentos gerados (vinculados a um registro) -----
+  listDocuments(entity, id) {
+    return api.get(`${base}/documentos`, { params: { entity, id } });
+  },
+  getDocument(documentId) {
+    return api.get(`${base}/documentos/${documentId}`);
+  },
+  createDocument(payload) {
+    // payload: { entity, id, template_id?, type_id?, name, descript?, content? }
+    return api.post(`${base}/documentos`, payload);
+  },
+  updateDocument(documentId, payload) {
+    // payload: { name?, descript?, content? }
+    return api.put(`${base}/documentos/${documentId}`, payload);
+  },
+  deleteDocument(documentId) {
+    return api.delete(`${base}/documentos/${documentId}`);
+  },
 };

@@ -5,6 +5,7 @@ import { useRoute } from "vue-router";
 import api from "../../../api";
 import ContractInfo from "../../../components/Admin/Contracts/ContractInfo.vue";
 import AnexoLote from "../../../components/Admin/Contracts/AnexoLote.vue";
+import ContractDocumentsPanel from "../../../components/Cdoc/ContractDocumentsPanel.vue";
 
 const route = useRoute();
 
@@ -21,12 +22,19 @@ onMounted(async () => {
   <DashboardLayout>
     <v-card v-if="contract">
       <v-tabs v-model="tab" bg-color="primary" dark>
+        <v-tab value="contratos">CONTRATOS</v-tab>
         <v-tab value="geral">Geral</v-tab>
         <v-tab value="anexos">Anexos</v-tab>
         <v-tab value="timeline">Linha do Tempo</v-tab>
       </v-tabs>
 
       <v-window v-model="tab">
+        <v-window-item value="contratos">
+          <v-card flat class="pa-4">
+            <ContractDocumentsPanel entity="contract" :record-id="contract.id" />
+          </v-card>
+        </v-window-item>
+
         <v-window-item value="geral">
           <v-card flat class="pa-4">
             <ContractInfo :contract="contract" />
