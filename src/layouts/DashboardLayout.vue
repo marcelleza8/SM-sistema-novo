@@ -11,21 +11,12 @@
       </button>
     </header>
 
-    <!-- Menu Superior -->
+    <!-- Menu Superior (árvore em cascata + faixa de favoritos/recentes) -->
     <nav
       v-if="!showOnlyContent"
-      class="bg-gray-200 px-4 py-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm"
+      class="bg-gray-200 px-4 py-2"
     >
-      <RouterLink class="nav-link" :to="{ name: 'Admin/Dashboard' }">Dashboard</RouterLink>
-      <RouterLink class="nav-link" :to="{ name: 'Admin/Chip/Busca' }">Busca de Chip</RouterLink>
-      <RouterLink class="nav-link" :to="{ name: 'AdminOperadoraListPage' }">Operadoras</RouterLink>
-      <RouterLink class="nav-link" :to="{ name: 'AdminChipListPage' }">SIM card</RouterLink>
-      <RouterLink class="nav-link" :to="{ name: 'AdminOperadoraAccountListPage' }">Contas de operadora</RouterLink>
-      <RouterLink class="nav-link" :to="{ name: 'AdminSystemJobsList' }">Jobs</RouterLink>
-      <RouterLink class="nav-link" :to="{ name: 'ReportConsumption' }">Relatório consumo</RouterLink>
-      <RouterLink class="nav-link" :to="{ name: 'AdminContractListPage' }">Contratos</RouterLink>
-      <RouterLink class="nav-link" :to="{ name: 'AdminKnowledgeBase' }">Base de Conhecimento</RouterLink>
-      <RouterLink class="nav-link" :to="{ name: 'AdminContractDocuments' }">Documentos de Contrato</RouterLink>
+      <MenuBar />
     </nav>
 
     <!-- Área do Dashboard -->
@@ -44,8 +35,12 @@
 </template>
 
 <script setup>
-import { useRouter } from "vue-router";
+import { watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
+import { useMenuStore } from "../stores/menuStore";
+import { findLeaf } from "../utils/menuTree";
+import MenuBar from "../components/MenuBar.vue";
 
 const APPNAME = import.meta.env.VITE_APPNAME;
 const appVersion = process.env.VUE_APP_VERSION;
@@ -58,6 +53,18 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const route = useRoute();
+const menu = useMenuStore();
+
+// Registra a visita a cada navegação — alimenta a fila de recentes.
+watch(
+  () => route.name,
+  (name) => {
+    const leaf = findLeaf(name);
+    if (leaf) menu.visit(leaf);
+  },
+  { immediate: true }
+);
 
 const logout = async () => {
   await useAuthStore().logout();
