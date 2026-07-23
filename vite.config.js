@@ -9,6 +9,9 @@ const devProxyTarget =
   process.env.VITE_DEV_PROXY_TARGET || "http://localhost:8000";
 
 export default defineConfig({
+  // Servido sob /sistema-novo/ (mesmo base do router: createWebHistory("/sistema-novo")).
+  // Sem isto o Vite gera assets em "/assets" (raiz) e eles dao 404 sob /sistema-novo/.
+  base: "/sistema-novo/",
   plugins: [vue()],
   resolve: {
     alias: {
