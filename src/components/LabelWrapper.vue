@@ -28,10 +28,15 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import LabelTag from "./LabelTag.vue";
-import denoApi from "../denoApi";
+import api from "../api";
 
 const tags = ref([]);
 const timerId = ref(0);
+
+// Status terminais: nada mais muda depois deles.
+const TERMINAL = new Set(["finished", "completed", "error", "failed"]);
+const hasActive = () =>
+  tags.value.some((t) => !TERMINAL.has(String(t.status || "").toLowerCase()));
 const displayedTags = computed(() => [...tags.value].reverse());
 
 const parseDate = (value) => {
@@ -92,28 +97,42 @@ const normalizeTag = (tag) => ({
 });
 
 const loadTags = async () => {
-  const response = await denoApi.get("/v2/upload/upload-progress");
-
-  if (response) {
-    const responseTags = Array.isArray(response.data?.tags)
+  // Migrado do deno-api (/v2/upload/upload-progress) para o Laravel
+  // (admin/upload-progress), que le as mesmas chaves de progresso do Redis.
+  try {
+    const response = await api.get("admin/upload-progress");
+    const responseTags = Array.isArray(response?.data?.tags)
       ? response.data.tags
       : [];
     tags.value = responseTags.map(normalizeTag);
+  } catch (_e) {
+    // silencioso: o proximo ciclo tenta de novo (progresso e auto-corretivo).
   }
 };
 
+// Polling adaptativo (Nivel 1): 1,5s enquanto ha import ativo; 20s ocioso.
+// Antes era setInterval fixo de 1s SEMPRE (mesmo sem upload), o que gerava
+// ~1 req/s por aba aberta indefinidamente. O backoff ocioso ainda detecta um
+// novo import em ate 20s, sem martelar o backend.
+const ACTIVE_MS = 1500;
+const IDLE_MS = 20000;
+
+const scheduleNext = () => {
+  const delay = hasActive() ? ACTIVE_MS : IDLE_MS;
+  timerId.value = setTimeout(tick, delay);
+};
+
+const tick = async () => {
+  await loadTags();
+  scheduleNext();
+};
+
 onMounted(() => {
-  if (!import.meta.env?.VITE_PROD && false) {
-    return false;
-  }
-  loadTags();
-  timerId.value = setInterval(() => {
-    loadTags();
-  }, 1000);
+  tick();
 });
 
 onUnmounted(() => {
-  clearInterval(timerId.value);
+  clearTimeout(timerId.value);
 });
 </script>
 <style scoped>

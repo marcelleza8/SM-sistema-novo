@@ -75,7 +75,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { formatInTimeZone } from "date-fns-tz";
-import denoApi from "../denoApi";
+import api from "../api";
 import { useRoute } from "vue-router";
 
 const timeZone = "America/Sao_Paulo";
@@ -177,7 +177,8 @@ function onConfirm() {
 }
 
 async function deleteItem() {
-  const response = await denoApi.delete(`/v2/upload/upload-progress/${props.redisKey}`);
+  // Migrado do deno-api para o Laravel (admin/upload-progress/{key}).
+  await api.delete(`admin/upload-progress/${encodeURIComponent(props.redisKey)}`);
 
   showToast("Item deletado com sucesso", "success");
 }
