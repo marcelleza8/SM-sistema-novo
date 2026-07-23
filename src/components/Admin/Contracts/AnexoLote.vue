@@ -89,7 +89,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import api from "../../../api";
-import denoApi from "../../../denoApi";
 import Swal from "sweetalert2";
 import LineInputField from "../../BuscaChipVerifier.vue";
 import OutputLines from "./outputLines.vue";
@@ -134,7 +133,7 @@ async function validarLote() {
   if (!inputState.value.formatted.length) return;
   validando.value = true;
   try {
-    const response = await denoApi.post("/v2/client/sims", {
+    const response = await api.post("admin/chip/buscar", {
       values: inputState.value.formatted,
     });
 

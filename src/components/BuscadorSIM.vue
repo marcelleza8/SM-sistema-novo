@@ -1,12 +1,14 @@
 <script setup>
 import Swal from "sweetalert2";
-import denoApi from "../denoApi";
+import api from "../api";
 import { defineEmits } from "vue";
 
 const emit = defineEmits(["item-encontrado"]);
-// Busca usando POST com um array no body
+// Busca usando POST com um array no body.
+// Migrado do deno-api (/v2/client/sims) para o Laravel (admin/chip/buscar) —
+// mesmo shape {details:[...]}, agora autenticado (Bearer via interceptor do api).
 async function buscarNoBackend(valor) {
-  const res = await denoApi.post("/v2/client/sims", { values: [valor] });
+  const res = await api.post("admin/chip/buscar", { values: [valor] });
   return res.data;
 }
 
@@ -43,7 +45,7 @@ async function abrirBuscador() {
       const result = await buscarNoBackend(busca);
       Swal.close();
 
-      if (result && result?.details) {
+      if (result && result?.details?.length) {
         if (result?.details[0].status_id != 4) {
           let html = `SIM card com o status <strong>${result?.details[0].status_name}</strong>`;
           if (result?.details[0].clients_name) {

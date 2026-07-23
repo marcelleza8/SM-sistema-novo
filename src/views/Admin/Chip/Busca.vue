@@ -76,7 +76,6 @@
 import { computed, ref } from "vue";
 import Swal from "sweetalert2";
 import api from "../../../api";
-import denoApi from "../../../denoApi";
 import DashboardLayout from "../../../layouts/DashboardLayout.vue";
 import SelectAjaxVue from "../../../components/SelectAjax.vue";
 import BuscaChipverifier from "../../../components/BuscaChipVerifier.vue";
@@ -86,7 +85,6 @@ import ChipChangeStatus from "../../../components/ChipChangeStatus.vue";
 import ChipChangePlan from "../../../components/ChipChangePlan.vue";
 import { useHumanReadableBytes } from "../../../composable/useHumanReadableBytes";
 import SIMmanualInport from "../../../components/SIMmanualInport.vue";
-import axios from "axios";
 const verify = ref({
   client: null,
 });
@@ -176,11 +174,16 @@ const search = async () => {
         signal: controller.signal,
       }
     ); */
+    // Migrado do deno-api (/v2/client/sims e /simcards) para o Laravel
+    // (admin/chip/buscar) — um endpoint só aceita {values} OU {client}, mesmo
+    // shape {details:[...]}, autenticado via Bearer.
     let response;
     if (verify.value?.client) {
-      response = await denoApi.get(`/v2/client/${verify.value.client}/simcards`);
+      response = await api.post("admin/chip/buscar", {
+        client: verify.value.client,
+      });
     } else {
-      response = await denoApi.post("/v2/client/sims", {
+      response = await api.post("admin/chip/buscar", {
         values: verify.value.items.formatted,
       });
     }
@@ -212,18 +215,17 @@ const exportSelected = async (selected) => {
 
   if (!downLink.value || !selected?.length) return;
 
-  // Monta query string com múltiplos parâmetros "coluna=1"
+  // Monta query string com múltiplos parâmetros "colunas[]=campo"
   const query = selected
     .map((field) => `colunas[]=${encodeURIComponent(field)}`)
     .join("&");
+  // downLink já vem do Laravel como caminho relativo (admin/chip/buscar/export?
+  // key=...); usa o `api` (baseURL /api/v1/ + Bearer). O export reaproveita os
+  // details cacheados no Redis pela busca — sem reconsultar o banco.
   const url = `${downLink.value}&${query}`;
 
   try {
-    const response = await axios({
-      url,
-      method: "GET",
-      responseType: "blob",
-    });
+    const response = await api.get(url, { responseType: "blob" });
 
     console.log(response);
 
